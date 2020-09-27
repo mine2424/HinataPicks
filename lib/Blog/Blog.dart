@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:hinataPicks/Blog/BlogCard.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:async';
 
 class BlogPage extends StatefulWidget {
   @override
@@ -12,145 +15,271 @@ class _BlogPageState extends State<BlogPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xFF7CC7E8),
-        elevation: 0,
-        brightness: Brightness.light,
-        centerTitle: true,
-        title: Text(
-          'HinataPicks',
-          style: TextStyle(fontFamily: 'serif'),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.search),
-          onPressed: () {},
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {},
-          )
-        ],
-      ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 15, bottom: 15),
-          child: Column(
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  children: [
-                    Container(
-                      child: Column(
-                        children: <Widget>[
-                          StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('blogArticle')
-                                // .orderBy('createAt', descending: true)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              if (!snapshot.hasData ||
-                                  snapshot.data.docs.length == 0) {
-                                return Container(
-                                  child: Center(
-                                    child: GFLoader(type: GFLoaderType.circle),
-                                  ),
-                                );
-                              } else {
-                                return ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  itemCount: snapshot.data.docs.length,
-                                  // separatorBuilder: (context, index) =>
-                                  //     Divider(),
-                                  itemBuilder: (context, index) {
-                                    final _blogList = snapshot.data.docs[index];
-                                    return Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Stack(children: [
-                                          Container(
-                                            margin: EdgeInsets.fromLTRB(
-                                                20.0, 5.0, 20.0, 5.0),
-                                            height: 160,
-                                            width: double.infinity,
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.end,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20),
-                                                        child: Image(
-                                                          width: 102,
-                                                          // height: 160,
-                                                          image: NetworkImage(
-                                                              _blogList.get(
-                                                                  'imageUrl')),
-                                                          fit: BoxFit.fitWidth,
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        width: 30,
-                                                      ),
-                                                      Container(
-                                                        width: 160,
-                                                        child: Text(
-                                                          (_blogList
-                                                              .get('title')
-                                                              .toString()),
-                                                          style: TextStyle(
-                                                              fontSize: 15,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600),
-                                                          maxLines: 5,
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          )
-                                        ]),
-                                      ],
-                                    );
-                                  },
-                                );
-                              }
-                            },
+        // TODO お気に入りメンバーの登録 || それのみ表示
+        // TODO 匿名ログインが必要になる
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('blogArticle')
+              .orderBy('id', descending: false)
+              //.orderBy('createAt')
+              .limit(10)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData || snapshot.data.docs.length == 0) {
+              return Container(
+                child: Center(
+                  child: GFLoader(type: GFLoaderType.circle),
+                ),
+              );
+            } else {
+              final snapData = snapshot.data.docs;
+              return Column(
+                children: [
+                  SizedBox(height: 20),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "New Blog",
+                          style: TextStyle(fontSize: 36.0, letterSpacing: 1.0),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 25),
+                  SizedBox(
+                    height: 320,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      physics: BouncingScrollPhysics(),
+                      itemCount: snapData.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: EdgeInsets.only(left: 30),
+                          child: BlogCardWidget(
+                            dataDocs: snapshot.data.docs[index],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 50),
+                  Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Search Blog",
+                            style:
+                                TextStyle(fontSize: 36.0, letterSpacing: 1.0),
                           )
                         ],
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
+                      )),
+                  SizedBox(height: 11),
+                  StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('memberLists')
+                          .orderBy('id', descending: false)
+                          .limit(22)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData ||
+                            snapshot.data.docs.length == 0) {
+                          return Container(
+                            child: Center(
+                              child: GFLoader(type: GFLoaderType.circle),
+                            ),
+                          );
+                        } else {
+                          final memberList = snapshot.data.docs;
+                          return Column(
+                            //TODO 個別ページに遷移させる
+                            children: [
+                              Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 46),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "1期生",
+                                        style: TextStyle(
+                                            fontSize: 24.0, letterSpacing: 0.7),
+                                      )
+                                    ],
+                                  )),
+                              Column(children: [
+                                SizedBox(
+                                    height: 150,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      physics: BouncingScrollPhysics(),
+                                      itemCount: memberList.length - 12,
+                                      itemBuilder: (context, index) {
+                                        return Padding(
+                                          padding: EdgeInsets.only(left: 30),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Container(
+                                                width: 100,
+                                                height: 100,
+                                                decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    image: DecorationImage(
+                                                        fit: BoxFit.cover,
+                                                        image: NetworkImage(
+                                                          memberList[index].get(
+                                                              'profile_img'),
+                                                        ))),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ))
+                              ]),
+                              Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 46),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "2期生",
+                                        style: TextStyle(
+                                            fontSize: 24.0, letterSpacing: 0.7),
+                                      )
+                                    ],
+                                  )),
+                              Column(
+                                children: [
+                                  SizedBox(
+                                      height: 150,
+                                      child: ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        physics: BouncingScrollPhysics(),
+                                        itemCount: memberList.length - 9,
+                                        itemBuilder: (context, index) {
+                                          return Padding(
+                                            padding: EdgeInsets.only(left: 30),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Container(
+                                                  width: 100,
+                                                  height: 100,
+                                                  decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      image: DecorationImage(
+                                                          fit: BoxFit.cover,
+                                                          image: NetworkImage(
+                                                            memberList[
+                                                                    9 + index]
+                                                                .get(
+                                                                    'profile_img'),
+                                                          ))),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      ))
+                                ],
+                              ),
+                              Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 46),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "3期生",
+                                        style: TextStyle(
+                                            fontSize: 24.0, letterSpacing: 0.7),
+                                      )
+                                    ],
+                                  )),
+                              Column(
+                                children: [
+                                  SizedBox(
+                                      height: 150,
+                                      child: ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        physics: BouncingScrollPhysics(),
+                                        itemCount: memberList.length - 18,
+                                        itemBuilder: (context, index) {
+                                          return Padding(
+                                            padding: EdgeInsets.only(left: 30),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Container(
+                                                  width: 100,
+                                                  height: 100,
+                                                  decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      image: DecorationImage(
+                                                          fit: BoxFit.cover,
+                                                          image: NetworkImage(
+                                                            memberList[
+                                                                    18 + index]
+                                                                .get(
+                                                                    'profile_img'),
+                                                          ))),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      ))
+                                ],
+                              ),
+                            ],
+                          );
+                        }
+                      }),
+                  SizedBox(
+                    height: 70,
+                  )
+                ],
+              );
+            }
+          },
         ),
       ),
     );
   }
+
+  Future<void> _launchURL(String link) async {
+    if (await canLaunch(link)) {
+      await launch(
+        link,
+        forceSafariVC: true,
+        forceWebView: true,
+        enableJavaScript: true,
+      );
+    } else {
+      throw 'サイトを開くことが出来ません。。。 $link';
+    }
+  }
 }
+
+// FlatButton(
+//   onPressed: () => setState(() {
+//     _launchURL(_blogList.get('url'));
+//   }),
+//   child:
