@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:hinataPicks/Blog/BlogCard.dart';
+import 'package:hinataPicks/Blog/personalBlog.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 
@@ -23,7 +24,7 @@ class _BlogPageState extends State<BlogPage> {
               .collection('blogArticle')
               .orderBy('id', descending: false)
               //.orderBy('createAt')
-              .limit(10)
+              .limit(20)
               .snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData || snapshot.data.docs.length == 0) {
@@ -58,9 +59,14 @@ class _BlogPageState extends State<BlogPage> {
                       itemCount: snapData.length,
                       itemBuilder: (context, index) {
                         return Padding(
-                          padding: EdgeInsets.only(left: 30),
-                          child: BlogCardWidget(
-                            dataDocs: snapshot.data.docs[index],
+                          padding: EdgeInsets.only(left: 0),
+                          child: FlatButton(
+                            onPressed: () => setState(() {
+                              _launchURL(snapData[index].get('url'));
+                            }),
+                            child: BlogCardWidget(
+                              dataDocs: snapshot.data.docs[index],
+                            ),
                           ),
                         );
                       },
@@ -73,7 +79,7 @@ class _BlogPageState extends State<BlogPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Search Blog",
+                            "Search Member",
                             style:
                                 TextStyle(fontSize: 36.0, letterSpacing: 1.0),
                           )
@@ -114,31 +120,44 @@ class _BlogPageState extends State<BlogPage> {
                                   )),
                               Column(children: [
                                 SizedBox(
-                                    height: 150,
+                                    height: 140,
                                     child: ListView.builder(
                                       scrollDirection: Axis.horizontal,
                                       physics: BouncingScrollPhysics(),
-                                      itemCount: memberList.length - 12,
+                                      itemCount: memberList.length - 13,
                                       itemBuilder: (context, index) {
                                         return Padding(
-                                          padding: EdgeInsets.only(left: 30),
+                                          padding: EdgeInsets.only(left: 0),
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.center,
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
                                             children: [
-                                              Container(
-                                                width: 100,
-                                                height: 100,
-                                                decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    image: DecorationImage(
-                                                        fit: BoxFit.cover,
-                                                        image: NetworkImage(
-                                                          memberList[index].get(
-                                                              'profile_img'),
-                                                        ))),
+                                              FlatButton(
+                                                //TODO 引数としてblogArticle全てのブログデータと選択した人の名前を入れる
+                                                onPressed: () => Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            PersonalBlogPage(
+                                                                profile:
+                                                                    memberList[
+                                                                        index],
+                                                                blogData:
+                                                                    snapData))),
+                                                child: Container(
+                                                  width: 97,
+                                                  height: 100,
+                                                  decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      image: DecorationImage(
+                                                          fit: BoxFit.cover,
+                                                          image: NetworkImage(
+                                                            memberList[index].get(
+                                                                'profile_img'),
+                                                          ))),
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -162,33 +181,45 @@ class _BlogPageState extends State<BlogPage> {
                               Column(
                                 children: [
                                   SizedBox(
-                                      height: 150,
+                                      height: 140,
                                       child: ListView.builder(
                                         scrollDirection: Axis.horizontal,
                                         physics: BouncingScrollPhysics(),
-                                        itemCount: memberList.length - 9,
+                                        itemCount: memberList.length - 13,
                                         itemBuilder: (context, index) {
                                           return Padding(
-                                            padding: EdgeInsets.only(left: 30),
+                                            padding: EdgeInsets.only(left: 0),
                                             child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.center,
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
-                                                Container(
-                                                  width: 100,
-                                                  height: 100,
-                                                  decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      image: DecorationImage(
-                                                          fit: BoxFit.cover,
-                                                          image: NetworkImage(
-                                                            memberList[
-                                                                    9 + index]
-                                                                .get(
-                                                                    'profile_img'),
-                                                          ))),
+                                                FlatButton(
+                                                  onPressed: () => Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              PersonalBlogPage(
+                                                                  profile:
+                                                                      memberList[9 +
+                                                                          index],
+                                                                  blogData:
+                                                                      snapData))),
+                                                  child: Container(
+                                                    width: 97,
+                                                    height: 100,
+                                                    decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        image: DecorationImage(
+                                                            fit: BoxFit.cover,
+                                                            image: NetworkImage(
+                                                              memberList[
+                                                                      9 + index]
+                                                                  .get(
+                                                                      'profile_img'),
+                                                            ))),
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -213,33 +244,45 @@ class _BlogPageState extends State<BlogPage> {
                               Column(
                                 children: [
                                   SizedBox(
-                                      height: 150,
+                                      height: 140,
                                       child: ListView.builder(
                                         scrollDirection: Axis.horizontal,
                                         physics: BouncingScrollPhysics(),
                                         itemCount: memberList.length - 18,
                                         itemBuilder: (context, index) {
                                           return Padding(
-                                            padding: EdgeInsets.only(left: 30),
+                                            padding: EdgeInsets.only(left: 0),
                                             child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.center,
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
-                                                Container(
-                                                  width: 100,
-                                                  height: 100,
-                                                  decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      image: DecorationImage(
-                                                          fit: BoxFit.cover,
-                                                          image: NetworkImage(
-                                                            memberList[
-                                                                    18 + index]
-                                                                .get(
-                                                                    'profile_img'),
-                                                          ))),
+                                                FlatButton(
+                                                  onPressed: () => Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              PersonalBlogPage(
+                                                                  profile:
+                                                                      memberList[18 +
+                                                                          index],
+                                                                  blogData:
+                                                                      snapData))),
+                                                  child: Container(
+                                                    width: 97,
+                                                    height: 100,
+                                                    decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        image: DecorationImage(
+                                                            fit: BoxFit.cover,
+                                                            image: NetworkImage(
+                                                              memberList[18 +
+                                                                      index]
+                                                                  .get(
+                                                                      'profile_img'),
+                                                            ))),
+                                                  ),
                                                 ),
                                               ],
                                             ),
