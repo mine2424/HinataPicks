@@ -22,7 +22,7 @@ class _BlogPageState extends State<BlogPage> {
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('blogArticle')
-              .orderBy('id', descending: false)
+              //.orderBy('id', descending: false)
               //.orderBy('createAt')
               .limit(20)
               .snapshots(),

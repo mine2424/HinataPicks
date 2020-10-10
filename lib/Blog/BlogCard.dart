@@ -35,7 +35,10 @@ class BlogCardWidget extends StatelessWidget {
                     Padding(
                       padding:
                           EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                      child: Text(dataDocs.get('title'),
+                      child: Text(
+                          (dataDocs.get('title'))
+                              .toString()
+                              .substring(0, dataDocs.get('title').length - 5),
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 20.0,

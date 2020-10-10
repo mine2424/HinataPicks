@@ -1,8 +1,12 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class PersonalBlogPage extends StatelessWidget {
   var profile;
   var blogData;
+  var sortBlogData;
   PersonalBlogPage({Key key, @required this.profile, @required this.blogData})
       : super(key: key);
 
@@ -10,68 +14,64 @@ class PersonalBlogPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Color(0xFF21BFBD),
-        body: SingleChildScrollView(
-          child: Stack(
-            children: [
-              ListView(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 15, left: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          icon: Icon(Icons.arrow_back),
-                          color: Colors.white,
-                        ),
-                        Container(
-                          width: 70,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                  icon: Icon(Icons.settings),
-                                  color: Colors.white,
-                                  onPressed: () {})
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
+        body: Stack(
+          alignment: Alignment.center,
+          children: <Widget>[
+            Container(
+              height: 500,
+              width: 300,
+            ),
+            Positioned(
+              child: Text(this.profile.get('name')),
+              top: 50,
+              left: -40,
+            ),
+            DraggableScrollableSheet(
+              maxChildSize: 0.85,
+              builder:
+                  (BuildContext context, ScrollController scrolController) {
+                return Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(40),
+                          topRight: Radius.circular(40))),
+                  child: ListView.builder(
+                    controller: scrolController,
+                    //shrinkWrap: true,
+                    //physics: NeverScrollableScrollPhysics(),
+                    itemCount: this.sortBlogData.length,
+                    itemBuilder: (context, index) {
+                      //sortBlogData.addAll(this.blogData[index].get('title').where((elem) => elem.contain(this.profile.get('name'))));
+                      for (int i = 0; i < this.blogData.length; i++) {
+                        if (blogData[i]
+                            .get('title')
+                            .contains(profile.get('name'))) {
+                          print(index);
+                          this.sortBlogData.add(blogData[i].toString());
+                        }
+                      }
+
+                      return ListTile(
+                        title: Text(this.sortBlogData.toString()),
+                      );
+                    },
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Stack(children: [
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.4,
-                      child: Image(
-                        image: NetworkImage(this.profile.get('profile_img')),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ]),
-                  Container(
-                    height: MediaQuery.of(context).size.height,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(65),
-                            topRight: Radius.circular(65))),
-                    child: Container(
-                      height: MediaQuery.of(context).size.height - 300,
-                      child: ListView(
-                        children: [],
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ],
-          ),
+                );
+              },
+            )
+          ],
         ));
+  }
+
+//firebase storageを使ったjsonファイルのデータ取得コード（貴重）
+  printUrl() async {
+    StorageReference ref =
+        FirebaseStorage.instance.ref().child("hinata/pyBlogArticle.json");
+    String url = (await ref.getDownloadURL()).toString();
+    //print(url);
+    final response = await http.get(url);
+    final ListData = jsonDecode(utf8.decode(response.body.runes.toList()));
+    print(ListData["7"]['page_number']['title']);
   }
 }
