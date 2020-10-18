@@ -57,7 +57,7 @@ flutter_native_splash:
   image: "assets/images/HinataPicks-logo.png" 
   color: "FFFFFF"
 
-flutter_icon:
+flutter_icons:
   android: true
   ios: true
   image_path: "assets/images/HinataPicks-logo.png"

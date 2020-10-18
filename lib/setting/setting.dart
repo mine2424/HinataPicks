@@ -61,31 +61,7 @@ class _SettingPageState extends State<SettingPage> {
                           color: const Color(0xff7cc8e9),
                           shape: const StadiumBorder(),
                           onPressed: () {
-                            if (_callName == "" ||
-                                _callMail == "" ||
-                                _callContext == "") {
-                              showDialog(
-                                  context: context,
-                                  // barrierDismissible: false,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                        title: const Text('確認'),
-                                        content: const Text('記入漏れがあります'),
-                                        actions: <Widget>[
-                                          FlatButton(
-                                            child: const Text('OK'),
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(0),
-                                          ),
-                                        ]);
-                                  });
-                            } else {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => FormFinish()));
-                              addFormList();
-                            }
+                            addFormList();
                           },
                         ),
                       ),
@@ -106,11 +82,29 @@ class _SettingPageState extends State<SettingPage> {
       //login and describe user details to firebase
       try {
         await Firebase.initializeApp();
-        FirebaseFirestore.instance.collection('usersContactForm').add({
-          'createAt': Timestamp.now(),
-          'email': _callMail,
-          'text': _callContext
-        });
+        if (_callName == "" || _callMail == "" || _callContext == "") {
+          return showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                    title: const Text('注意'),
+                    content: const Text('記入漏れがあります'),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: const Text('OK'),
+                        onPressed: () => Navigator.of(context).pop(0),
+                      ),
+                    ]);
+              });
+        } else {
+          FirebaseFirestore.instance.collection('usersContactForm').add({
+            'createAt': Timestamp.now(),
+            'email': _callMail,
+            'text': _callContext
+          });
+          return Navigator.push(
+              context, MaterialPageRoute(builder: (context) => FormFinish()));
+        }
       } catch (error) {
         print(error);
       }
