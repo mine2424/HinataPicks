@@ -1,77 +1,143 @@
-import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:hinataPicks/models/mainModels.dart';
+import 'package:provider/provider.dart';
+import 'blogWebview.dart';
 
-class PersonalBlogPage extends StatelessWidget {
-  var profile;
-  var blogData;
-  var sortBlogData;
-  PersonalBlogPage({Key key, @required this.profile, @required this.blogData})
+class PersonalBlogPage extends StatefulWidget {
+  var profile, allHinataBlog;
+  PersonalBlogPage(
+      {Key key, @required this.profile, @required this.allHinataBlog})
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Color(0xFF21BFBD),
-        body: Stack(
-          alignment: Alignment.center,
-          children: <Widget>[
-            Container(
-              height: 500,
-              width: 300,
-            ),
-            Positioned(
-              child: Text(this.profile.get('name')),
-              top: 50,
-              left: -40,
-            ),
-            DraggableScrollableSheet(
-              maxChildSize: 0.85,
-              builder:
-                  (BuildContext context, ScrollController scrolController) {
-                return Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(40),
-                          topRight: Radius.circular(40))),
-                  child: ListView.builder(
-                    controller: scrolController,
-                    //shrinkWrap: true,
-                    //physics: NeverScrollableScrollPhysics(),
-                    itemCount: this.sortBlogData.length,
-                    itemBuilder: (context, index) {
-                      //sortBlogData.addAll(this.blogData[index].get('title').where((elem) => elem.contain(this.profile.get('name'))));
-                      for (int i = 0; i < this.blogData.length; i++) {
-                        if (blogData[i]
-                            .get('title')
-                            .contains(profile.get('name'))) {
-                          print(index);
-                          this.sortBlogData.add(blogData[i].toString());
-                        }
-                      }
+  _PersonalBlogPageState createState() => _PersonalBlogPageState();
+}
 
-                      return ListTile(
-                        title: Text(this.sortBlogData.toString()),
-                      );
-                    },
-                  ),
-                );
-              },
-            )
-          ],
-        ));
+class _PersonalBlogPageState extends State<PersonalBlogPage> {
+  List sortBlogData = [];
+
+  initState() {
+    for (int i = 0; i < widget.allHinataBlog.length; i++) {
+      if (widget.profile["name"] == widget.allHinataBlog[i]["name"]) {
+        sortBlogData.add(widget.allHinataBlog[i]);
+      }
+    }
+    super.initState();
   }
 
-//firebase storageを使ったjsonファイルのデータ取得コード（貴重）
-  printUrl() async {
-    StorageReference ref =
-        FirebaseStorage.instance.ref().child("hinata/pyBlogArticle.json");
-    String url = (await ref.getDownloadURL()).toString();
-    //print(url);
-    final response = await http.get(url);
-    final ListData = jsonDecode(utf8.decode(response.body.runes.toList()));
-    print(ListData["7"]['page_number']['title']);
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<MainModel>(
+        create: (_) => MainModel()..fetchHinataBlog(),
+        child: Consumer<MainModel>(builder: (context, model, child) {
+          return Scaffold(
+            backgroundColor: const Color(0xFF21BFBD),
+            body: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 45, left: 15),
+                    child: IconButton(
+                      color: Colors.white,
+                      icon: Icon(Icons.arrow_back_outlined),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 40),
+                    child: Row(
+                      children: [
+                        Text(
+                          widget.profile["name"],
+                          style: const TextStyle(
+                              fontSize: 26,
+                              fontFamily: "SF-Pro-Text-Regular",
+                              color: Colors.white),
+                        ),
+                        const SizedBox(width: 60),
+                        Container(
+                          width: 110,
+                          height: 110,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: NetworkImage(widget.profile["image"]),
+                              )),
+                        )
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height, //-185
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.only(topLeft: Radius.circular(40))),
+                    child: ListView.builder(
+                      key: GlobalKey(),
+                      primary: false,
+                      itemCount: sortBlogData.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 20, top: 20),
+                          child: FlatButton(
+                              onPressed: () => setState(() {
+                                    if (sortBlogData[index]['href'] != "") {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => BlogWebView(
+                                                  blogData:
+                                                      sortBlogData[index])));
+                                    }
+                                  }),
+                              child: Column(
+                                children: [
+                                  (sortBlogData[index]["image"] == "" ||
+                                          sortBlogData[index]["image"] == null)
+                                      ? Container(
+                                          height: 150,
+                                          decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                  fit: BoxFit.cover,
+                                                  image: NetworkImage(
+                                                      'https://www.hinatazaka46.com/files/14/hinata/img/noimage_blog.jpg'))),
+                                        )
+                                      : Container(
+                                          height: 250,
+                                          decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                  fit: BoxFit.cover,
+                                                  image: NetworkImage(
+                                                      sortBlogData[index]
+                                                          ["image"]))),
+                                        ),
+                                  ListTile(
+                                    title: Text(
+                                      sortBlogData[index]['title'],
+                                    ),
+                                    subtitle: Text(
+                                        sortBlogData[index]['date'].toString()),
+                                  ),
+                                ],
+                              )),
+                        );
+                      },
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        }));
   }
 }

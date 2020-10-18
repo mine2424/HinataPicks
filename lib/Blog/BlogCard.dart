@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:getwidget/getwidget.dart';
-import 'dart:math';
 
 var cardAspectRatio = 12.0 / 16.0;
 var widgetAspectRatio = cardAspectRatio * 1.2;
 
 class BlogCardWidget extends StatelessWidget {
-  var dataDocs;
-
-  BlogCardWidget({this.dataDocs});
+  var allHinataBlog;
+  BlogCardWidget({Key key, @required this.allHinataBlog}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +21,12 @@ class BlogCardWidget extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: <Widget>[
-              Image.network(dataDocs.get('imageUrl'), fit: BoxFit.cover),
+              (allHinataBlog["image"] == "" || allHinataBlog["image"] == null)
+                  ? Image.network(
+                      "https://www.hinatazaka46.com/files/14/hinata/img/noimage_blog.jpg",
+                      fit: BoxFit.cover,
+                    )
+                  : Image.network(allHinataBlog["image"], fit: BoxFit.cover),
               Align(
                 alignment: Alignment.bottomLeft,
                 child: Column(
@@ -33,18 +34,27 @@ class BlogCardWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                      child: Text(
-                          (dataDocs.get('title'))
-                              .toString()
-                              .substring(0, dataDocs.get('title').length - 5),
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.0,
-                              fontFamily: "SF-Pro-Text-Regular")),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 8.0),
+                      child: (allHinataBlog["image"] == "" ||
+                              allHinataBlog["image"] == null)
+                          ? Text(
+                              (allHinataBlog['title']).toString() +
+                                  ' | ' +
+                                  allHinataBlog['name'],
+                              maxLines: 3,
+                              style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20.0,
+                                  fontFamily: "SF-Pro-Text-Regular"))
+                          : Text((allHinataBlog['title']).toString(),
+                              maxLines: 3,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20.0,
+                                  fontFamily: "SF-Pro-Text-Regular")),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10.0,
                     ),
                     Padding(
@@ -52,11 +62,11 @@ class BlogCardWidget extends StatelessWidget {
                       child: Container(
                         padding: EdgeInsets.symmetric(
                             horizontal: 22.0, vertical: 6.0),
-                        decoration: BoxDecoration(
-                            color: Colors.blueAccent,
-                            borderRadius: BorderRadius.circular(20.0)),
-                        child: Text("あとで読む",
-                            style: TextStyle(color: Colors.white)),
+                        // decoration: BoxDecoration(
+                        //     color: Colors.blueAccent,
+                        //     borderRadius: BorderRadius.circular(20.0)),
+                        // child: Text("あとで読む",
+                        //     style: TextStyle(color: Colors.white)),
                       ),
                     )
                   ],

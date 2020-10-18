@@ -269,9 +269,15 @@ PODS:
     - FirebaseCore (~> 6.6)
     - GTMSessionFetcher/Core (~> 1.1)
   - Flutter (1.0.0)
+  - flutter_email_sender (0.0.1):
+    - Flutter
+  - flutter_native_image (0.0.1):
+    - Flutter
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
+  - gallery_saver (0.0.1):
+    - Flutter
   - GoogleDataTransport (7.2.0):
     - nanopb (~> 1.30905.0)
   - GoogleUtilities/Environment (6.7.2):
@@ -303,7 +309,15 @@ PODS:
     - gRPC-Core/Interface (= 1.28.2)
   - gRPC-Core/Interface (1.28.2)
   - GTMSessionFetcher/Core (1.4.0)
+  - image_downloader (0.0.1):
+    - Flutter
+  - image_gallery_saver (1.5.0):
+    - Flutter
   - image_picker (0.0.1):
+    - Flutter
+  - image_picker_saver (0.0.1):
+    - Flutter
+  - launch_review (0.0.1):
     - Flutter
   - leveldb-library (1.22)
   - nanopb (1.30905.0):
@@ -314,10 +328,14 @@ PODS:
   - path_provider (0.0.1):
     - Flutter
   - PromisesObjC (1.2.10)
+  - shared_preferences (0.0.1):
+    - Flutter
   - sqflite (0.0.1):
     - Flutter
     - FMDB (~> 2.7.2)
   - url_launcher (0.0.1):
+    - Flutter
+  - webview_flutter (0.0.1):
     - Flutter
 
 DEPENDENCIES:
@@ -325,10 +343,19 @@ DEPENDENCIES:
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_storage (from `.symlinks/plugins/firebase_storage/ios`)
   - Flutter (from `Flutter`)
+  - flutter_email_sender (from `.symlinks/plugins/flutter_email_sender/ios`)
+  - flutter_native_image (from `.symlinks/plugins/flutter_native_image/ios`)
+  - gallery_saver (from `.symlinks/plugins/gallery_saver/ios`)
+  - image_downloader (from `.symlinks/plugins/image_downloader/ios`)
+  - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
+  - image_picker_saver (from `.symlinks/plugins/image_picker_saver/ios`)
+  - launch_review (from `.symlinks/plugins/launch_review/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
+  - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
+  - webview_flutter (from `.symlinks/plugins/webview_flutter/ios`)
 
 SPEC REPOS:
   trunk:
@@ -360,14 +387,32 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_storage/ios"
   Flutter:
     :path: Flutter
+  flutter_email_sender:
+    :path: ".symlinks/plugins/flutter_email_sender/ios"
+  flutter_native_image:
+    :path: ".symlinks/plugins/flutter_native_image/ios"
+  gallery_saver:
+    :path: ".symlinks/plugins/gallery_saver/ios"
+  image_downloader:
+    :path: ".symlinks/plugins/image_downloader/ios"
+  image_gallery_saver:
+    :path: ".symlinks/plugins/image_gallery_saver/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
+  image_picker_saver:
+    :path: ".symlinks/plugins/image_picker_saver/ios"
+  launch_review:
+    :path: ".symlinks/plugins/launch_review/ios"
   path_provider:
     :path: ".symlinks/plugins/path_provider/ios"
+  shared_preferences:
+    :path: ".symlinks/plugins/shared_preferences/ios"
   sqflite:
     :path: ".symlinks/plugins/sqflite/ios"
   url_launcher:
     :path: ".symlinks/plugins/url_launcher/ios"
+  webview_flutter:
+    :path: ".symlinks/plugins/webview_flutter/ios"
 
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
@@ -383,20 +428,29 @@ SPEC CHECKSUMS:
   FirebaseFirestore: 8c158bdde010fa397386333a74570eaef033e62d
   FirebaseStorage: f4f39ae834a7145963b913f54e2f24a9db1d8fac
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  flutter_email_sender: f787522d0e82f50e5766c1213dbffff22fdcf009
+  flutter_native_image: 9c0b7451838484458e5b0fae007b86a4c2d4bdfe
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
+  gallery_saver: 9fc173c9f4fcc48af53b2a9ebea1b643255be542
   GoogleDataTransport: 672fb0ce96fe7f7f31d43672fca62ad2c9c86f7b
   GoogleUtilities: 7f2f5a07f888cdb145101d6042bc4422f57e70b3
   "gRPC-C++": 13d8ccef97d5c3c441b7e3c529ef28ebee86fad2
   gRPC-Core: 4afa11bfbedf7cdecd04de535a9e046893404ed5
   GTMSessionFetcher: 6f5c8abbab8a9bce4bb3f057e317728ec6182b10
+  image_downloader: 73e190d6c9f286f2649554051348d9cb319cd4b3
+  image_gallery_saver: 259eab68fb271cfd57d599904f7acdc7832e7ef2
   image_picker: 9c3312491f862b28d21ecd8fdf0ee14e601b3f09
+  image_picker_saver: 4f28bd70e1efdca68ad88beab0f11d22cffe04f6
+  launch_review: 75d5a956ba8eaa493e9c9d4bf4c05e505e8d5ed0
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   nanopb: c43f40fadfe79e8b8db116583945847910cbabc9
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   PromisesObjC: b14b1c6b68e306650688599de8a45e49fae81151
+  shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   sqflite: 4001a31ff81d210346b500c55b17f4d6c7589dd0
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
+  webview_flutter: d2b4d6c66968ad042ad94cbb791f5b72b4678a96
 
-PODFILE CHECKSUM: b2190a7c2a451aca24d6455a7de1c4b3e0816224
+PODFILE CHECKSUM: b83810d6151bbce93c6790f3d52e605e8a65944c
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.0.rc.1

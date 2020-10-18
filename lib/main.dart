@@ -2,8 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hinataPicks/Blog/Blog.dart';
 
-import 'homeSection.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -11,7 +9,7 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  // This widget is the root of your application.
+
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -21,12 +19,12 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'HinataPicks',
       theme: ThemeData(
         visualDensity: VisualDensity.adaptivePlatformDensity,
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: HomeSection(),
+      home: BlogPage(),
     );
   }
 }
