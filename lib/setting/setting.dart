@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hinataPicks/Blog/Blog.dart';
+import 'package:hinataPicks/homeSection.dart';
 
 class SettingPage extends StatefulWidget {
   @override
@@ -123,7 +124,7 @@ class _FormFinishState extends State<FormFinish> {
     Future.delayed(const Duration(seconds: 2), () {
       setState(() {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => BlogPage()));
+            context, MaterialPageRoute(builder: (context) => HomeSection()));
       });
     });
     super.initState();

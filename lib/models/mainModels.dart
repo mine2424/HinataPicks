@@ -7,7 +7,7 @@ class MainModel extends ChangeNotifier {
   List allHinataBlog = [];
 
   fetchHinataBlog() async {
-    StorageReference ref =
+    var ref =
         FirebaseStorage.instance.ref().child('hinata/oneYearHinataBlog.json');
     String url = (await ref.getDownloadURL()).toString();
 
@@ -25,7 +25,6 @@ class MainModel extends ChangeNotifier {
         var listIndex = 1 + x;
         var xIndex = 2 + x;
         blogDict['image$xIndex'] = listData[i.toString()]['image$listIndex'];
-
       }
       blogDict['href'] = listData[i.toString()]['href'];
       allHinataBlog.add(blogDict);

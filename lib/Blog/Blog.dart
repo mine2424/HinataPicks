@@ -25,89 +25,26 @@ class _BlogPageState extends State<BlogPage> {
   var allHinataBlog;
   var memberList;
 
-  //外部URLへページ遷移(webviewではない)
-  Future<void> _launchURL(String link) async {
-    if (await canLaunch(link)) {
-      await launch(
-        link,
-        universalLinksOnly: true,
-        forceSafariVC: true,
-        forceWebView: false,
-      );
-    } else {
-      throw 'サイトを開くことが出来ません。。。 $link';
-    }
-  }
-
   // 最初の起動ならチュートリアル表示
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final preference = await SharedPreferences.getInstance();
-      if (preference.getBool('isFirstLaunch') != true) {
-        await showDialog(
-          context: context,
-          builder: (_) {
-            return Tutorialpage();
-          },
-        );
-      }
-    });
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   WidgetsBinding.instance.addPostFrameCallback((_) async {
+  //     final preference = await SharedPreferences.getInstance();
+  //     if (preference.getBool('isFirstLaunch') != true) {
+  //       await showDialog(
+  //         context: context,
+  //         builder: (_) {
+  //           return Tutorialpage();
+  //         },
+  //       );
+  //     }
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("HinataPicks", style: TextStyle(color: Colors.black)),
-        iconTheme: const IconThemeData(color: Colors.black),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        brightness: Brightness.light,
-        centerTitle: true,
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            const SizedBox(
-              height: 30,
-            ),
-            Center(
-                child: Column(
-              children: [
-                const Text('アプリについて'),
-              ],
-            )),
-            Divider(),
-            ListTile(
-              title: const Text(
-                'お問い合わせ',
-                style: TextStyle(fontSize: 20),
-              ),
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => SettingPage()));
-              },
-            ),
-            ListTile(
-              title: const Text(
-                '利用規約',
-                style: TextStyle(fontSize: 20),
-              ),
-              onTap: () {
-                _launchURL('https://hinatapicks.web.app/');
-              },
-            ),
-            const ListTile(
-              title: const Text(
-                'version 1.0.0',
-                style: TextStyle(fontSize: 20),
-              ),
-            ),
-          ],
-        ),
-      ),
       body: ChangeNotifierProvider<MainModel>(
         create: (_) => MainModel()..fetchHinataBlog(),
         child: Consumer<MainModel>(builder: (context, model, child) {
@@ -137,10 +74,14 @@ class _BlogPageState extends State<BlogPage> {
                   key: GlobalKey(),
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
-                  itemCount: 12,
+                  itemCount: 8,
                   itemBuilder: (BuildContext context, int index) {
                     return allHinataBlog.length == 0
-                        ? Center(child: const CircularProgressIndicator())
+                        ? Container(
+                            child: const Center(
+                              child: GFLoader(type: GFLoaderType.circle),
+                            ),
+                          )
                         : Padding(
                             padding: const EdgeInsets.only(left: 0),
                             child: FlatButton(

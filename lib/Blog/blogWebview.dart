@@ -39,64 +39,20 @@ class _BlogWebViewState extends State<BlogWebView> {
         elevation: 0,
         brightness: Brightness.light,
         centerTitle: true,
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            key: GlobalKey(),
-            itemBuilder: (BuildContext context) {
-              count = 0;
-              return _imageSelects.map((s) {
-                count += 1;
-                return PopupMenuItem(
-                  key: GlobalKey(),
-                  child: (s == null)
-                      ? const Text('画像がありません')
-                      : FlatButton(
-                          onPressed: () {
-                            getImage(s);
-                            showDialog(
-                              context: context,
-                              builder: (_) {
-                                return AlertDialog(
-                                  content: const Text("画像を保存しました"),
-                                  actions: <Widget>[
-                                    FlatButton(
-                                      child: const Text("OK"),
-                                      onPressed: () => Navigator.pop(context),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                          child: Row(
-                            children: [
-                              Image(
-                                  image: NetworkImage(s),
-                                  fit: BoxFit.cover,
-                                  height: 46),
-                              const SizedBox(width: 10),
-                              Text('画像$count'),
-                            ],
-                          )),
-                  value: s,
-                );
-              }).toList();
-            },
-          )
-        ],
       ),
       body: WebView(
         key: GlobalKey(),
         initialUrl: widget.blogData["href"],
+        javascriptMode: JavascriptMode.unrestricted,
       ),
     );
   }
 
-  void getImage(url) async {
-    var response = await http.get(url);
-    var filePath =
-        await ImagePickerSaver.saveFile(fileData: response.bodyBytes);
-    var savedFile = File.fromUri(Uri.file(filePath));
-    print(savedFile);
-  }
+  // void getImage(url) async {
+  //   var response = await http.get(url);
+  //   var filePath =
+  //       await ImagePickerSaver.saveFile(fileData: response.bodyBytes);
+  //   var savedFile = File.fromUri(Uri.file(filePath));
+  //   print(savedFile);
+  // }
 }
