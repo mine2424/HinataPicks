@@ -39,7 +39,7 @@ class BoardPageState extends State<BoardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         floatingActionButton: BottomAddCommentButton(
-            collection: widget.collection, chatLength: chatLength),
+            collection: widget.collection, chatLength: chatLength,firebaseAuth:_firebaseAuth),
         body: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection(widget.collection)
@@ -51,7 +51,13 @@ class BoardPageState extends State<BoardPage> {
                   ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [const Text('Now Loading...')],
+                        children: [
+                          const Text(
+                            'Now Loading...',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w300),
+                          )
+                        ],
                       ),
                     )
                   : (snapshot.data.docs.length == 0)
@@ -84,14 +90,14 @@ class BoardPageState extends State<BoardPage> {
                             DateTime createdTime =
                                 chatsItem.data()['createAt'].toDate();
                             return (chatsItem.data()['name'] == '運営')
-                                ? commentBox(chatsItem, createdTime)
-                                : commentBox(chatsItem, createdTime);
+                                ? commentBox(chatsItem, createdTime, 'admin')
+                                : commentBox(chatsItem, createdTime, '');
                           },
                         );
             }));
   }
 
-  Widget commentBox(chatsItem, createdTime) {
+  Widget commentBox(chatsItem, createdTime, isAdmin) {
     return Row(
       children: [
         Padding(
@@ -120,8 +126,10 @@ class BoardPageState extends State<BoardPage> {
             Container(
               margin: const EdgeInsets.only(top: 5, bottom: 5, left: 20),
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              decoration: const BoxDecoration(
-                  color: Color(0xff7cc8e9),
+              decoration: BoxDecoration(
+                  color: (isAdmin == 'admin')
+                      ? Colors.red[300]
+                      : Color(0xff7cc8e9),
                   borderRadius: BorderRadius.only(
                       topRight: Radius.circular(20),
                       bottomRight: Radius.circular(20),
@@ -136,7 +144,9 @@ class BoardPageState extends State<BoardPage> {
                       Text(
                         chatsItem.data()['name'],
                         style: TextStyle(
-                            color: Colors.blueGrey,
+                            color: (isAdmin == 'admin')
+                                ? Colors.black
+                                : Colors.blueGrey,
                             fontSize: 13.2,
                             fontWeight: FontWeight.bold),
                       ),

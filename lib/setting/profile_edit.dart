@@ -20,6 +20,7 @@ class ProfileEditPage extends StatefulWidget {
 
 class _ProfileEditPageState extends State<ProfileEditPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  static String firebaseManagerUid = '7l7ZFl0sDuQw80G77A0RyElFlzS2';
   final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
   String name, gameId, message;
   File _image;
@@ -127,6 +128,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       ),
       child: TextFormField(
         validator: (input) {
+          if (_firebaseAuth != firebaseManagerUid &&
+              (input == '運営' || input == 'うんえい')) {
+            return 'その言葉は使用出来ません';
+          }
           for (var i = 0; i < prohibisionWords.length; i++) {
             if (input.contains(prohibisionWords[i])) {
               return '不適切な言葉が含まれています';

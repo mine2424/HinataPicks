@@ -118,7 +118,7 @@ class _HomeSectionState extends State<HomeSection> {
                 ),
                 const ListTile(
                   title: const Text(
-                    'version 1.0.2',
+                    'version 1.0.5',
                     style: TextStyle(fontSize: 20),
                   ),
                 ),
@@ -155,7 +155,7 @@ class _HomeSectionState extends State<HomeSection> {
                                     child: Row(
                                       children: [
                                         Icon(
-                                          Icons.video_library,
+                                          Icons.chat,
                                           color: Colors.indigo,
                                         ),
                                         SizedBox(
@@ -169,7 +169,7 @@ class _HomeSectionState extends State<HomeSection> {
                                       ],
                                     ),
                                   )
-                                : Icon(Icons.video_library)),
+                                : Icon(Icons.chat)),
                         GestureDetector(
                             onTap: () {
                               setState(() {
@@ -227,7 +227,7 @@ class _HomeSectionState extends State<HomeSection> {
                                         SizedBox(
                                           width: 8,
                                         ),
-                                        Text('Other',
+                                        Text('設定',
                                             style: TextStyle(
                                                 color: Colors.indigo,
                                                 fontWeight: FontWeight.bold,
