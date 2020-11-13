@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -221,7 +219,7 @@ class _HomeSectionState extends State<HomeSection> {
                                     child: Row(
                                       children: [
                                         Icon(
-                                          Icons.settings,
+                                          Icons.people,
                                           color: Colors.indigo,
                                         ),
                                         SizedBox(
@@ -235,7 +233,7 @@ class _HomeSectionState extends State<HomeSection> {
                                       ],
                                     ),
                                   )
-                                : Icon(Icons.settings)),
+                                : Icon(Icons.people)),
                       ],
                     ),
                   ))

@@ -3,6 +3,12 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+class Blog {
+  String title, name, image;
+  var date;
+  Blog({this.date, this.image, this.name, this.title});
+}
+
 class MainModel extends ChangeNotifier {
   List allHinataBlog = [];
 
@@ -29,6 +35,7 @@ class MainModel extends ChangeNotifier {
       blogDict['href'] = listData[i.toString()]['href'];
       allHinataBlog.add(blogDict);
     }
+    // print(allHinataBlog);
     notifyListeners();
   }
 }

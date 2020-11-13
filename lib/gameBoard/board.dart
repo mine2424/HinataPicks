@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hinataPicks/classes/users.dart';
+import 'package:hinataPicks/gameBoard/board_user_info.dart';
 import 'package:hinataPicks/gameBoard/bottomAddCommentButton.dart';
 import 'package:hinataPicks/setting/setting.dart';
 import 'package:selectable_autolink_text/selectable_autolink_text.dart';
@@ -39,7 +40,9 @@ class BoardPageState extends State<BoardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         floatingActionButton: BottomAddCommentButton(
-            collection: widget.collection, chatLength: chatLength,firebaseAuth:_firebaseAuth),
+            collection: widget.collection,
+            chatLength: chatLength,
+            sendUser: ''),
         body: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection(widget.collection)
@@ -101,21 +104,31 @@ class BoardPageState extends State<BoardPage> {
     return Row(
       children: [
         Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.13,
-              height: MediaQuery.of(context).size.width * 0.13,
-              decoration: BoxDecoration(
-                  // border: Border.all(
-                  //     color: Colors.grey, width: 5),
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: (chatsItem.data()['imagePath'] == null ||
-                              chatsItem.data()['imagePath'] == '')
-                          ? AssetImage('assets/images/HinataPicks-logo-new.png')
-                          : NetworkImage(chatsItem.data()['imagePath']))),
+            padding: const EdgeInsets.only(left: 0),
+            child: FlatButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => BoardUserInfoPage(
+                            userUid: chatsItem.data()['userUid'])));
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.165,
+                height: MediaQuery.of(context).size.width * 0.165,
+                decoration: BoxDecoration(
+                    // border: Border.all(
+                    //     color: Colors.grey, width: 5),
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: (chatsItem.data()['imagePath'] == null ||
+                                chatsItem.data()['imagePath'] == '')
+                            ? AssetImage(
+                                'assets/images/HinataPicks-logo-new.png')
+                            : NetworkImage(chatsItem.data()['imagePath']))),
+              ),
             )),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,8 +137,8 @@ class BoardPageState extends State<BoardPage> {
               height: 15,
             ),
             Container(
-              margin: const EdgeInsets.only(top: 5, bottom: 5, left: 20),
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              margin: const EdgeInsets.only(top: 5, bottom: 5, left: 3),
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               decoration: BoxDecoration(
                   color: (isAdmin == 'admin')
                       ? Colors.red[300]
@@ -159,7 +172,7 @@ class BoardPageState extends State<BoardPage> {
                             chatsItem.data()['context'],
                             style: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 16,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w300),
                             linkStyle:
                                 const TextStyle(color: Colors.blueAccent),
@@ -177,16 +190,40 @@ class BoardPageState extends State<BoardPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 24),
-              child: Text(
-                createdTime.toLocal().toString().substring(
-                      0,
-                      createdTime.toLocal().toString().length - 7,
-                    ),
-                style: const TextStyle(
-                    color: Colors.blueGrey,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold),
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+              child: Row(
+                children: [
+                  Text(
+                    createdTime.toLocal().toString().substring(
+                          0,
+                          createdTime.toLocal().toString().length - 10,
+                        ),
+                    style: const TextStyle(
+                        color: Colors.blueGrey,
+                        fontSize: 12.6,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(width: 38),
+                  Text(
+                    '返信',
+                    style: TextStyle(
+                        color: Colors.blueGrey,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(),
+                    icon: Icon(Icons.reply),
+                    color: Colors.grey,
+                    onPressed: () {
+                      // BottomAddCommentButton(
+                      //     collection: widget.collection,
+                      //     chatLength: chatLength,
+                      //     sendUser: chatsItem.data()['name']);
+                    },
+                  ),
+                ],
               ),
             )
           ],

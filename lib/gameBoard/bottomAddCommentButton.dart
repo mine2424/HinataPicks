@@ -14,9 +14,9 @@ import 'package:url_launcher/url_launcher.dart';
 class BottomAddCommentButton extends StatefulWidget {
   var chatLength;
   String collection;
-  String firebaseAuth;
+  String sendUser;
   BottomAddCommentButton(
-      {Key key, @required this.collection, this.chatLength, this.firebaseAuth})
+      {Key key, @required this.collection, this.chatLength, this.sendUser})
       : super(key: key);
   @override
   _BottomAddCommentButtonState createState() => _BottomAddCommentButtonState();
@@ -34,7 +34,7 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
 
   addComment(collection, customerModel) async {
     if (_formKey.currentState.validate()) {
-      String userImagePath, userName;
+      String userImagePath = '', userName, sendUserImageInfo;
       final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
       this.isSending = true;
       _formKey.currentState.save();
@@ -44,11 +44,20 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
       final commentLength =
           await FirebaseFirestore.instance.collection(collection).get();
       // 各Userで画像を取得
-      final sendUserInfoDoc = FirebaseFirestore.instance
+      final sendUserInfoDoc = await FirebaseFirestore.instance
           .collection('customerInfo')
-          .doc(_firebaseAuth);
-      final sendUserInfoQuery = await sendUserInfoDoc.get();
-      final sendUserImageInfo = sendUserInfoQuery.get('imagePath');
+          .doc(_firebaseAuth)
+          .get();
+
+      if (sendUserInfoDoc.data()['imagePath'] == null) {
+        FirebaseFirestore.instance
+            .collection('customerInfo')
+            .doc(_firebaseAuth)
+            .update({'imagePath': ''});
+      } else {
+        sendUserImageInfo = sendUserInfoDoc.data()['imagePath'];
+      }
+
       if (sendUserImageInfo != null) {
         userImagePath = sendUserImageInfo;
       }
@@ -104,6 +113,9 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
               : Container(
                   margin: const EdgeInsets.only(bottom: 55),
                   child: FloatingActionButton(
+                    heroTag: (widget.collection == 'friendChats')
+                        ? 'hero1'
+                        : 'hero2',
                     onPressed: () {
                       return showDialog(
                           context: context,
@@ -117,7 +129,10 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
                                         (customerModel.name == '')
                                             ? Text('匿名おひさまさん')
                                             : Text(customerModel.name),
+                                        Text('${widget.sendUser}に返信'),
                                         TextFormField(
+                                          keyboardType: TextInputType.multiline,
+                                          maxLines: null,
                                           validator: (input) {
                                             for (var i = 0;
                                                 i < prohibisionWords.length;
@@ -128,8 +143,6 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
                                               }
                                               if (input.isEmpty) {
                                                 return '投稿内容を入力してください';
-                                              } else {
-                                                return null;
                                               }
                                             }
                                             return null;

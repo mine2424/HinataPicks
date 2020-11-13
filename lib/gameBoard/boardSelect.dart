@@ -12,7 +12,7 @@ class _BoardSelectState extends State<BoardSelect> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: WillPopScope(
         onWillPop: () async {
           return false;
@@ -36,7 +36,6 @@ class _BoardSelectState extends State<BoardSelect> {
                   tabs: [
                     Tab(text: 'ひなこい'),
                     Tab(text: '雑談'),
-                    Tab(text: '出演番組観戦'),
                   ],
                 ), // TabBar
               ],
@@ -46,7 +45,6 @@ class _BoardSelectState extends State<BoardSelect> {
             children: [
               BoardPage(collection: 'friendChats'),
               BoardPage(collection: 'discussionChats'),
-              BoardPage(collection: 'otherChats')
             ],
           ),
         ),
