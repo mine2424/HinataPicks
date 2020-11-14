@@ -8,6 +8,7 @@ import 'package:hinataPicks/gameBoard/bottomAddCommentButton.dart';
 import 'package:hinataPicks/homeSection.dart';
 import 'package:hinataPicks/prohibitionMatter/prohibitionWord.dart';
 import 'package:hinataPicks/setting/setting.dart';
+import 'package:launch_review/launch_review.dart';
 import 'package:selectable_autolink_text/selectable_autolink_text.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -23,6 +24,7 @@ class BoardPageState extends State<BoardPage> {
   List chatsList = [];
   String content;
   var _messageCautionsList = ['ブロック', '報告'];
+  //TODO シングルトン化してコードの省略
   final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
   var chatLength, customerImagePath;
 

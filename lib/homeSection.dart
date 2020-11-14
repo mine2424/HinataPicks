@@ -18,6 +18,7 @@ enum BottomIcons { Blog, Video, Archive, Other }
 
 class _HomeSectionState extends State<HomeSection> {
   BottomIcons bottomIcons = BottomIcons.Video;
+  final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
 
   //外部URLへページ遷移(webviewではない)
   Future<void> _launchURL(String link) async {
@@ -36,7 +37,36 @@ class _HomeSectionState extends State<HomeSection> {
   @override
   initState() {
     anonymouslyLogin();
+    reviewDialog();
     super.initState();
+  }
+
+  Future reviewDialog() async {
+    var fetchReviewCount = await FirebaseFirestore.instance
+        .collection('customerInfo')
+        .doc(_firebaseAuth)
+        .get();
+    int reviewCount = fetchReviewCount.data()['reviewCount'];
+    if (reviewCount % 10 == 0) {
+      return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: Text('お願い'),
+                content: Text('HinataPicksの関するレビュー・ご要望等を書いていただけたら幸いです！'),
+                actions: [
+                  FlatButton(
+                      onPressed: () {
+                        LaunchReview.launch(iOSAppId: "1536579253");
+                      },
+                      child: Text('レビューを書く')),
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('書かない'))
+                ],
+              ));
+    }
   }
 
   Future anonymouslyLogin() async {
@@ -49,6 +79,18 @@ class _HomeSectionState extends State<HomeSection> {
     doc.then((doc) async {
       if (doc.exists) {
         print("cheked document!");
+        final reviewCount = doc.data()['reviewCount'];
+        if (reviewCount == null) {
+          FirebaseFirestore.instance
+              .collection('customerInfo')
+              .doc(firebaseAuth.currentUser.uid)
+              .update({'reviewCount': 1});
+        } else {
+          FirebaseFirestore.instance
+              .collection('customerInfo')
+              .doc(firebaseAuth.currentUser.uid)
+              .update({'reviewCount': reviewCount + 1});
+        }
       } else {
         print("No such document!");
         await FirebaseFirestore.instance
@@ -63,6 +105,7 @@ class _HomeSectionState extends State<HomeSection> {
           'insta': '',
           'name': '',
           'imagePath': '',
+          'reviewCount': 0,
           'createAt': Timestamp.now()
         });
       }
@@ -126,7 +169,7 @@ class _HomeSectionState extends State<HomeSection> {
                 ),
                 const ListTile(
                   title: const Text(
-                    'version 1.0.5',
+                    'version 1.0.6',
                     style: TextStyle(fontSize: 20),
                   ),
                 ),
