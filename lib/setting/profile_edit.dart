@@ -127,6 +127,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         ),
       ),
       child: TextFormField(
+        keyboardType: TextInputType.multiline,
+        maxLines: null,
         validator: (input) {
           if (_firebaseAuth != firebaseManagerUid &&
               (input == '運営' || input == 'うんえい')) {

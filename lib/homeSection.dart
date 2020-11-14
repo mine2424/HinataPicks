@@ -5,6 +5,7 @@ import 'package:hinataPicks/gameBoard/board.dart';
 import 'package:hinataPicks/gameBoard/boardSelect.dart';
 import 'package:hinataPicks/setting/profile.dart';
 import 'package:hinataPicks/setting/setting.dart';
+import 'package:launch_review/launch_review.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'Blog/Blog.dart';
 
@@ -112,6 +113,15 @@ class _HomeSectionState extends State<HomeSection> {
                   ),
                   onTap: () {
                     _launchURL('https://hinatapicks.web.app/');
+                  },
+                ),
+                ListTile(
+                  title: const Text(
+                    'レビューを書く',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  onTap: () {
+                    LaunchReview.launch(iOSAppId: "1536579253");
                   },
                 ),
                 const ListTile(

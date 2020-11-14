@@ -115,6 +115,7 @@ class _BoardUserInfoPageState extends State<BoardUserInfoPage> {
         padding:
             const EdgeInsets.only(right: 12, left: 12, top: 14, bottom: 14),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -146,7 +147,7 @@ class _BoardUserInfoPageState extends State<BoardUserInfoPage> {
                   color: Colors.blueGrey,
                   fontWeight: FontWeight.bold,
                 ),
-                textAlign: TextAlign.end,
+                textAlign: TextAlign.start,
               ),
             ),
           ],

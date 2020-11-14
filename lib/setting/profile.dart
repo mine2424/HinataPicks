@@ -127,14 +127,21 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ],
             ),
-            Text(
-              myText,
-              style: TextStyle(
-                letterSpacing: 0.8,
-                color: Colors.blueGrey,
-                fontWeight: FontWeight.bold,
+            const SizedBox(
+              width: 15,
+            ),
+            Flexible(
+              child: Text(
+                myText,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 5,
+                style: TextStyle(
+                  letterSpacing: 0.8,
+                  color: Colors.blueGrey,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.start,
               ),
-              textAlign: TextAlign.end,
             ),
           ],
         ),

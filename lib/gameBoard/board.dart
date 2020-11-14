@@ -1,16 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hinataPicks/classes/users.dart';
 import 'package:hinataPicks/gameBoard/board_user_info.dart';
 import 'package:hinataPicks/gameBoard/bottomAddCommentButton.dart';
+import 'package:hinataPicks/homeSection.dart';
+import 'package:hinataPicks/prohibitionMatter/prohibitionWord.dart';
 import 'package:hinataPicks/setting/setting.dart';
 import 'package:selectable_autolink_text/selectable_autolink_text.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BoardPage extends StatefulWidget {
-  var collection;
+  var collection, addComment;
   BoardPage({Key key, @required this.collection}) : super(key: key);
   @override
   BoardPageState createState() => BoardPageState();
@@ -18,9 +21,12 @@ class BoardPage extends StatefulWidget {
 
 class BoardPageState extends State<BoardPage> {
   List chatsList = [];
+  String content;
   var _messageCautionsList = ['ブロック', '報告'];
-  var chatLength, customerImagePath;
   final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
+  var chatLength, customerImagePath;
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   //外部URLへページ遷移(webviewではない)
   Future<void> _launchURL(String link) async {
@@ -33,6 +39,61 @@ class BoardPageState extends State<BoardPage> {
       );
     } else {
       throw 'サイトを開くことが出来ません。。。 $link';
+    }
+  }
+
+  TapGestureRecognizer _recognizer = TapGestureRecognizer()
+    ..onTap = () {
+      launch('https://hinatapicks.web.app/');
+    };
+
+  replyComment(collection, replyName) async {
+    if (_formKey.currentState.validate()) {
+      String userImagePath = '', userName, sendUserImageInfo;
+      final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
+      _formKey.currentState.save();
+      // 各boardのcollectionを取得
+      final sendComment = FirebaseFirestore.instance.collection(collection);
+      // boradのコメントの個数を取得
+      final commentLength =
+          await FirebaseFirestore.instance.collection(collection).get();
+      // 各Userで画像を取得
+      final sendUserInfoDoc = await FirebaseFirestore.instance
+          .collection('customerInfo')
+          .doc(_firebaseAuth)
+          .get();
+
+      if (sendUserInfoDoc.data()['imagePath'] == null) {
+        FirebaseFirestore.instance
+            .collection('customerInfo')
+            .doc(_firebaseAuth)
+            .update({'imagePath': ''});
+      } else {
+        sendUserImageInfo = sendUserInfoDoc.data()['imagePath'];
+      }
+
+      if (sendUserImageInfo != null) {
+        userImagePath = sendUserImageInfo;
+      }
+      if (sendUserInfoDoc.data()['name'] == '' ||
+          sendUserInfoDoc.data()['name'] == null) {
+        userName = '匿名おひさまさん';
+      } else {
+        userName = sendUserInfoDoc.data()['name'];
+      }
+
+      sendComment.doc((commentLength.docs.length + 1).toString()).set({
+        'userUid': _firebaseAuth,
+        'name': userName,
+        'context': content,
+        'like': 0,
+        'imagePath': userImagePath,
+        'createAt': Timestamp.now(),
+        'returnName': replyName
+      });
+
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => HomeSection()));
     }
   }
 
@@ -142,7 +203,9 @@ class BoardPageState extends State<BoardPage> {
               decoration: BoxDecoration(
                   color: (isAdmin == 'admin')
                       ? Colors.red[300]
-                      : Color(0xff7cc8e9),
+                      : (chatsItem.data()['returnName'] != null)
+                          ? Color(0xff99FF73)
+                          : Color(0xff7cc8e9),
                   borderRadius: BorderRadius.only(
                       topRight: Radius.circular(20),
                       bottomRight: Radius.circular(20),
@@ -168,22 +231,58 @@ class BoardPageState extends State<BoardPage> {
                       ),
                       Container(
                           width: MediaQuery.of(context).size.width * 0.52,
-                          child: SelectableAutoLinkText(
-                            chatsItem.data()['context'],
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w300),
-                            linkStyle:
-                                const TextStyle(color: Colors.blueAccent),
-                            highlightedLinkStyle: TextStyle(
-                              color: Colors.blueAccent,
-                              backgroundColor:
-                                  Colors.blueAccent.withAlpha(0x33),
-                            ),
-                            onTap: (url) => _launchURL(url),
-                            onLongPress: (url) => Share.share(url),
-                          ))
+                          child: (chatsItem.data()['returnName'] != null)
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SelectableAutoLinkText(
+                                      '@' + chatsItem.data()['returnName'],
+                                      style: const TextStyle(
+                                          color: Colors.blue,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500),
+                                      linkStyle: const TextStyle(
+                                          color: Colors.blueAccent),
+                                      highlightedLinkStyle: TextStyle(
+                                        color: Colors.blueAccent,
+                                        backgroundColor:
+                                            Colors.blueAccent.withAlpha(0x33),
+                                      ),
+                                    ),
+                                    SelectableAutoLinkText(
+                                      chatsItem.data()['context'],
+                                      style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w300),
+                                      linkStyle: const TextStyle(
+                                          color: Colors.blueAccent),
+                                      highlightedLinkStyle: TextStyle(
+                                        color: Colors.blueAccent,
+                                        backgroundColor:
+                                            Colors.blueAccent.withAlpha(0x33),
+                                      ),
+                                      onTap: (url) => _launchURL(url),
+                                      onLongPress: (url) => Share.share(url),
+                                    ),
+                                  ],
+                                )
+                              : SelectableAutoLinkText(
+                                  chatsItem.data()['context'],
+                                  style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w300),
+                                  linkStyle:
+                                      const TextStyle(color: Colors.blueAccent),
+                                  highlightedLinkStyle: TextStyle(
+                                    color: Colors.blueAccent,
+                                    backgroundColor:
+                                        Colors.blueAccent.withAlpha(0x33),
+                                  ),
+                                  onTap: (url) => _launchURL(url),
+                                  onLongPress: (url) => Share.share(url),
+                                ))
                     ],
                   ),
                 ],
@@ -209,7 +308,7 @@ class BoardPageState extends State<BoardPage> {
                     style: TextStyle(
                         color: Colors.blueGrey,
                         fontSize: 12.5,
-                        fontWeight: FontWeight.bold),
+                        fontWeight: FontWeight.normal),
                   ),
                   IconButton(
                     padding: EdgeInsets.zero,
@@ -217,10 +316,77 @@ class BoardPageState extends State<BoardPage> {
                     icon: Icon(Icons.reply),
                     color: Colors.grey,
                     onPressed: () {
-                      // BottomAddCommentButton(
-                      //     collection: widget.collection,
-                      //     chatLength: chatLength,
-                      //     sendUser: chatsItem.data()['name']);
+                      var myname = chatsItem.data()['name'];
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                title: const Text('返信'),
+                                content: SingleChildScrollView(
+                                  child: Form(
+                                    key: _formKey,
+                                    child: Column(
+                                      children: [
+                                        Text('${myname}に返信'),
+                                        TextFormField(
+                                          keyboardType: TextInputType.multiline,
+                                          maxLines: null,
+                                          validator: (input) {
+                                            for (var i = 0;
+                                                i < prohibisionWords.length;
+                                                i++) {
+                                              if (input.contains(
+                                                  prohibisionWords[i])) {
+                                                return '不適切な言葉が含まれています';
+                                              }
+                                              if (input.isEmpty) {
+                                                return '投稿内容を入力してください';
+                                              }
+                                            }
+                                            return null;
+                                          },
+                                          onSaved: (input) => content = input,
+                                          decoration: const InputDecoration(
+                                              labelText: '投稿内容'),
+                                        ),
+                                        const SizedBox(height: 15),
+                                        RichText(
+                                          text: TextSpan(
+                                            children: [
+                                              TextSpan(
+                                                text: '投稿すると',
+                                                style: TextStyle(
+                                                    color: Colors.grey[800]),
+                                              ),
+                                              TextSpan(
+                                                text: '利用規約',
+                                                style: TextStyle(
+                                                    color: Colors.lightBlue),
+                                                recognizer: _recognizer,
+                                              ),
+                                              TextSpan(
+                                                text: 'に同意したものとみなします。',
+                                                style: TextStyle(
+                                                    color: Colors.grey[800]),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                actions: [
+                                  FlatButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text('キャンセル')),
+                                  FlatButton(
+                                      onPressed: () {
+                                        replyComment(widget.collection,
+                                            chatsItem.data()['name']);
+                                      },
+                                      child: const Text('返信'))
+                                ],
+                              ));
                     },
                   ),
                 ],

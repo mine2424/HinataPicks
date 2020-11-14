@@ -12,31 +12,31 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BottomAddCommentButton extends StatefulWidget {
-  var chatLength;
+  var chatLength, addComment;
   String collection;
   String sendUser;
   BottomAddCommentButton(
       {Key key, @required this.collection, this.chatLength, this.sendUser})
       : super(key: key);
   @override
-  _BottomAddCommentButtonState createState() => _BottomAddCommentButtonState();
+  _BottomAddCommentButtonState createState() =>
+      _BottomAddCommentButtonState();
 }
 
 class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
   String name, content;
   int like;
   Timestamp createAt;
-  bool isSending = false;
   var customerModel;
   final approbation = 'https://hinatapicks.web.app/';
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   addComment(collection, customerModel) async {
+    print('aaa');
     if (_formKey.currentState.validate()) {
       String userImagePath = '', userName, sendUserImageInfo;
       final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
-      this.isSending = true;
       _formKey.currentState.save();
       // 各boardのcollectionを取得
       final sendComment = FirebaseFirestore.instance.collection(collection);
@@ -66,18 +66,36 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
       } else {
         userName = customerModel.name;
       }
-      sendComment.doc((commentLength.docs.length + 1).toString()).set({
-        'userUid': _firebaseAuth,
-        'name': userName,
-        'context': content,
-        'like': 0,
-        'imagePath': userImagePath,
-        'createAt': Timestamp.now()
-      });
+
+      // if (isReturn) {
+      //   sendComment.doc((commentLength.docs.length + 1).toString()).set({
+      //     'userUid': _firebaseAuth,
+      //     'name': userName,
+      //     'context': content,
+      //     'like': 0,
+      //     'imagePath': userImagePath,
+      //     'createAt': Timestamp.now(),
+      //     'returnName': widget.sendUser
+      //   });
+      // } else {
+      //   sendComment.doc((commentLength.docs.length + 1).toString()).set({
+      //     'userUid': _firebaseAuth,
+      //     'name': userName,
+      //     'context': content,
+      //     'like': 0,
+      //     'imagePath': userImagePath,
+      //     'createAt': Timestamp.now(),
+      //     'returnName': ''
+      //   });
+      // }
+
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => HomeSection()));
     }
   }
+
+  //TODO ここで関数を別ページでも使えるようにヘルパー関数を宣言する
+  // _BottomAddCommentButtonState(addComment);
 
   //外部URLへページ遷移(webviewではない)
   static _launchURL(String link) async {
@@ -129,7 +147,6 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
                                         (customerModel.name == '')
                                             ? Text('匿名おひさまさん')
                                             : Text(customerModel.name),
-                                        Text('${widget.sendUser}に返信'),
                                         TextFormField(
                                           keyboardType: TextInputType.multiline,
                                           maxLines: null,
