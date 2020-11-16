@@ -2,25 +2,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:hinataPicks/classes/friendChatClass.dart';
-import 'package:hinataPicks/classes/users.dart';
 import 'package:hinataPicks/homeSection.dart';
-import 'package:hinataPicks/models/boardModel.dart';
+import 'package:hinataPicks/models/userModel.dart';
 import 'package:hinataPicks/prohibitionMatter/prohibitionWord.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BottomAddCommentButton extends StatefulWidget {
-  var chatLength, addComment;
+  var chatLength;
   String collection;
   String sendUser;
   BottomAddCommentButton(
       {Key key, @required this.collection, this.chatLength, this.sendUser})
       : super(key: key);
   @override
-  _BottomAddCommentButtonState createState() =>
-      _BottomAddCommentButtonState();
+  _BottomAddCommentButtonState createState() => _BottomAddCommentButtonState();
 }
 
 class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
@@ -33,9 +30,8 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   addComment(collection, customerModel) async {
-    print('aaa');
     if (_formKey.currentState.validate()) {
-      String userImagePath = '', userName, sendUserImageInfo;
+      String userName, userImage = '';
       final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
       _formKey.currentState.save();
       // 各boardのcollectionを取得
@@ -43,51 +39,36 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
       // boradのコメントの個数を取得
       final commentLength =
           await FirebaseFirestore.instance.collection(collection).get();
-      // 各Userで画像を取得
+      // 各Userのdocを取得
       final sendUserInfoDoc = await FirebaseFirestore.instance
           .collection('customerInfo')
           .doc(_firebaseAuth)
           .get();
-
+      //投稿するユーザーの画像の判別
       if (sendUserInfoDoc.data()['imagePath'] == null) {
         FirebaseFirestore.instance
             .collection('customerInfo')
             .doc(_firebaseAuth)
             .update({'imagePath': ''});
       } else {
-        sendUserImageInfo = sendUserInfoDoc.data()['imagePath'];
+        userImage = sendUserInfoDoc.data()['imagePath'];
       }
-
-      if (sendUserImageInfo != null) {
-        userImagePath = sendUserImageInfo;
-      }
+      //投稿するユーザーの名前の判別
       if (customerModel.name == '') {
-        userName = '匿名おひさまさん';
+        userName =
+            '匿名おひさまさん(${sendUserInfoDoc.data()['uid'].toString().substring(0, 7)})';
       } else {
         userName = customerModel.name;
       }
 
-      // if (isReturn) {
-      //   sendComment.doc((commentLength.docs.length + 1).toString()).set({
-      //     'userUid': _firebaseAuth,
-      //     'name': userName,
-      //     'context': content,
-      //     'like': 0,
-      //     'imagePath': userImagePath,
-      //     'createAt': Timestamp.now(),
-      //     'returnName': widget.sendUser
-      //   });
-      // } else {
-      //   sendComment.doc((commentLength.docs.length + 1).toString()).set({
-      //     'userUid': _firebaseAuth,
-      //     'name': userName,
-      //     'context': content,
-      //     'like': 0,
-      //     'imagePath': userImagePath,
-      //     'createAt': Timestamp.now(),
-      //     'returnName': ''
-      //   });
-      // }
+      sendComment.doc((commentLength.docs.length + 1).toString()).set({
+        'userUid': _firebaseAuth,
+        'name': userName,
+        'context': content,
+        'like': 0,
+        'imagePath': userImage,
+        'createAt': Timestamp.now(),
+      });
 
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => HomeSection()));
@@ -118,16 +99,12 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<BoardModel>(
-        create: (_) => BoardModel()..fetchCustomerInfo(),
-        child: Consumer<BoardModel>(builder: (context, model, child) {
+    return ChangeNotifierProvider<UserModel>(
+        create: (_) => UserModel()..fetchCustomerInfo(),
+        child: Consumer<UserModel>(builder: (context, model, child) {
           customerModel = model.customerInfo;
           return (model.isLoading)
-              ? Center(
-                  child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [],
-                ))
+              ? const SizedBox()
               : Container(
                   margin: const EdgeInsets.only(bottom: 55),
                   child: FloatingActionButton(

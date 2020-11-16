@@ -2,13 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:hinataPicks/classes/users.dart';
 import 'package:hinataPicks/gameBoard/board_user_info.dart';
 import 'package:hinataPicks/gameBoard/bottomAddCommentButton.dart';
 import 'package:hinataPicks/homeSection.dart';
 import 'package:hinataPicks/prohibitionMatter/prohibitionWord.dart';
 import 'package:hinataPicks/setting/setting.dart';
-import 'package:launch_review/launch_review.dart';
 import 'package:selectable_autolink_text/selectable_autolink_text.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -51,7 +49,7 @@ class BoardPageState extends State<BoardPage> {
 
   replyComment(collection, replyName) async {
     if (_formKey.currentState.validate()) {
-      String userImagePath = '', userName, sendUserImageInfo;
+      String userName, userImage = '';
       final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
       _formKey.currentState.save();
       // 各boardのcollectionを取得
@@ -71,17 +69,14 @@ class BoardPageState extends State<BoardPage> {
             .doc(_firebaseAuth)
             .update({'imagePath': ''});
       } else {
-        sendUserImageInfo = sendUserInfoDoc.data()['imagePath'];
+        userImage = sendUserInfoDoc.data()['imagePath'];
       }
 
-      if (sendUserImageInfo != null) {
-        userImagePath = sendUserImageInfo;
-      }
-      if (sendUserInfoDoc.data()['name'] == '' ||
-          sendUserInfoDoc.data()['name'] == null) {
-        userName = '匿名おひさまさん';
+      if (sendUserInfoDoc.data()['insta'] == '') {
+        userName =
+            '匿名おひさまさん(${sendUserInfoDoc.data()['uid'].toString().substring(0, 7)})';
       } else {
-        userName = sendUserInfoDoc.data()['name'];
+        userName = sendUserInfoDoc.data()['insta'];
       }
 
       sendComment.doc((commentLength.docs.length + 1).toString()).set({
@@ -89,7 +84,7 @@ class BoardPageState extends State<BoardPage> {
         'name': userName,
         'context': content,
         'like': 0,
-        'imagePath': userImagePath,
+        'imagePath': userImage,
         'createAt': Timestamp.now(),
         'returnName': replyName
       });
@@ -118,11 +113,9 @@ class BoardPageState extends State<BoardPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
-                            'Now Loading...',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w300),
-                          )
+                          const Text('Now Loading...',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w300))
                         ],
                       ),
                     )
@@ -134,16 +127,12 @@ class BoardPageState extends State<BoardPage> {
                               (widget.collection == 'friendChats')
                                   ? Image.asset(
                                       'assets/images/chat-hinakoi.png',
-                                      scale: 1.4,
-                                    )
-                                  : Image.asset(
-                                      'assets/images/chat-normal.png',
-                                      scale: 1.4,
-                                    ),
+                                      scale: 1.4)
+                                  : Image.asset('assets/images/chat-normal.png',
+                                      scale: 1.4),
                               SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.2,
-                              )
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.2)
                             ],
                           ),
                         )
@@ -158,25 +147,22 @@ class BoardPageState extends State<BoardPage> {
                             return (chatsItem.data()['name'] == '運営')
                                 ? commentBox(chatsItem, createdTime, 'admin')
                                 : commentBox(chatsItem, createdTime, '');
-                          },
-                        );
+                          });
             }));
   }
 
   Widget commentBox(chatsItem, createdTime, isAdmin) {
     return Row(
       children: [
-        Padding(
-            padding: const EdgeInsets.only(left: 0),
-            child: FlatButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => BoardUserInfoPage(
-                            userUid: chatsItem.data()['userUid'])));
-              },
-              child: Container(
+        FlatButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => BoardUserInfoPage(
+                          userUid: chatsItem.data()['userUid'])));
+            },
+            child: Container(
                 width: MediaQuery.of(context).size.width * 0.165,
                 height: MediaQuery.of(context).size.width * 0.165,
                 decoration: BoxDecoration(
@@ -190,132 +176,121 @@ class BoardPageState extends State<BoardPage> {
                                 chatsItem.data()['imagePath'] == '')
                             ? AssetImage(
                                 'assets/images/HinataPicks-logo-new.png')
-                            : NetworkImage(chatsItem.data()['imagePath']))),
-              ),
-            )),
+                            : NetworkImage(chatsItem.data()['imagePath']))))),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(
-              height: 15,
-            ),
+            const SizedBox(height: 15),
             Container(
-              margin: const EdgeInsets.only(top: 5, bottom: 5, left: 3),
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-              decoration: BoxDecoration(
-                  color: (isAdmin == 'admin')
-                      ? Colors.red[300]
-                      : (chatsItem.data()['returnName'] != null)
-                          ? Color(0xff99FF73)
-                          : Color(0xff7cc8e9),
-                  borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(20),
-                      bottomRight: Radius.circular(20),
-                      bottomLeft: Radius.circular(20))),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
+                margin: const EdgeInsets.only(top: 5, bottom: 5, left: 3),
+                padding: EdgeInsets.symmetric(horizontal: 13, vertical: 10),
+                decoration: BoxDecoration(
+                    color: (isAdmin == 'admin')
+                        ? Colors.red[300]
+                        : (chatsItem.data()['returnName'] != null)
+                            ? Color(0xff99FF73)
+                            : Color(0xff7cc8e9),
+                    borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(20),
+                        bottomRight: Radius.circular(20),
+                        bottomLeft: Radius.circular(20))),
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [
                   SizedBox(height: 10),
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        chatsItem.data()['name'],
-                        style: TextStyle(
-                            color: (isAdmin == 'admin')
-                                ? Colors.black
-                                : Colors.blueGrey,
-                            fontSize: 13.2,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Container(
-                          width: MediaQuery.of(context).size.width * 0.52,
-                          child: (chatsItem.data()['returnName'] != null)
-                              ? Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SelectableAutoLinkText(
-                                      '@' + chatsItem.data()['returnName'],
-                                      style: const TextStyle(
-                                          color: Colors.blue,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500),
-                                      linkStyle: const TextStyle(
-                                          color: Colors.blueAccent),
-                                      highlightedLinkStyle: TextStyle(
-                                        color: Colors.blueAccent,
-                                        backgroundColor:
-                                            Colors.blueAccent.withAlpha(0x33),
-                                      ),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(chatsItem.data()['name'],
+                            style: TextStyle(
+                                color: (isAdmin == 'admin')
+                                    ? Colors.black
+                                    : Colors.blueGrey,
+                                fontSize: 13.2,
+                                fontWeight: FontWeight.bold)),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Container(
+                            width: MediaQuery.of(context).size.width * 0.52,
+                            child: (chatsItem.data()['returnName'] != null)
+                                ? Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                        SelectableAutoLinkText(
+                                            '@' +
+                                                chatsItem.data()['returnName'],
+                                            style: const TextStyle(
+                                                color: Colors.blue,
+                                                fontSize: 13.6,
+                                                fontWeight: FontWeight.w500),
+                                            linkStyle: const TextStyle(
+                                                color: Colors.blueAccent),
+                                            highlightedLinkStyle: TextStyle(
+                                                color: Colors.blueAccent,
+                                                backgroundColor: Colors
+                                                    .blueAccent
+                                                    .withAlpha(0x33))),
+                                        SelectableAutoLinkText(
+                                            chatsItem.data()['context'],
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w300),
+                                            linkStyle: const TextStyle(
+                                                color: Colors.blueAccent),
+                                            highlightedLinkStyle: TextStyle(
+                                                color: Colors.blueAccent,
+                                                backgroundColor: Colors
+                                                    .blueAccent
+                                                    .withAlpha(0x33)),
+                                            onTap: (url) => _launchURL(url),
+                                            onLongPress: (url) =>
+                                                Share.share(url))
+                                      ])
+                                : SelectableAutoLinkText(
+                                    chatsItem.data()['context'],
+                                    style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w300),
+                                    linkStyle: const TextStyle(
+                                        color: Colors.blueAccent),
+                                    highlightedLinkStyle: TextStyle(
+                                      color: Colors.blueAccent,
+                                      backgroundColor:
+                                          Colors.blueAccent.withAlpha(0x33),
                                     ),
-                                    SelectableAutoLinkText(
-                                      chatsItem.data()['context'],
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w300),
-                                      linkStyle: const TextStyle(
-                                          color: Colors.blueAccent),
-                                      highlightedLinkStyle: TextStyle(
-                                        color: Colors.blueAccent,
-                                        backgroundColor:
-                                            Colors.blueAccent.withAlpha(0x33),
-                                      ),
-                                      onTap: (url) => _launchURL(url),
-                                      onLongPress: (url) => Share.share(url),
-                                    ),
-                                  ],
-                                )
-                              : SelectableAutoLinkText(
-                                  chatsItem.data()['context'],
-                                  style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w300),
-                                  linkStyle:
-                                      const TextStyle(color: Colors.blueAccent),
-                                  highlightedLinkStyle: TextStyle(
-                                    color: Colors.blueAccent,
-                                    backgroundColor:
-                                        Colors.blueAccent.withAlpha(0x33),
-                                  ),
-                                  onTap: (url) => _launchURL(url),
-                                  onLongPress: (url) => Share.share(url),
-                                ))
-                    ],
-                  ),
-                ],
-              ),
-            ),
+                                    onTap: (url) => _launchURL(url),
+                                    onLongPress: (url) => Share.share(url)))
+                      ])
+                ])),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
               child: Row(
                 children: [
                   Text(
-                    createdTime.toLocal().toString().substring(
-                          0,
-                          createdTime.toLocal().toString().length - 10,
-                        ),
-                    style: const TextStyle(
-                        color: Colors.blueGrey,
-                        fontSize: 12.6,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(width: 38),
-                  Text(
-                    '返信',
-                    style: TextStyle(
-                        color: Colors.blueGrey,
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.normal),
-                  ),
+                      createdTime.toLocal().toString().substring(
+                            0,
+                            createdTime.toLocal().toString().length - 10,
+                          ),
+                      style: const TextStyle(
+                          color: Colors.blueGrey,
+                          fontSize: 12.6,
+                          fontWeight: FontWeight.bold)),
+                  SizedBox(width: 28),
+                  Text('返信',
+                      style: TextStyle(
+                          color: Colors.blueGrey,
+                          fontSize: 12.2,
+                          fontWeight: FontWeight.normal)),
                   IconButton(
                     padding: EdgeInsets.zero,
                     constraints: BoxConstraints(),
-                    icon: Icon(Icons.reply),
+                    icon: Icon(
+                      Icons.reply,
+                      size: 20,
+                    ),
                     color: Colors.grey,
                     onPressed: () {
                       var myname = chatsItem.data()['name'];

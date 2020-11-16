@@ -6,12 +6,7 @@ import 'package:hinataPicks/Blog/blogWebview.dart';
 import 'package:hinataPicks/Blog/personalBlog.dart';
 import 'package:hinataPicks/classes/member.dart';
 import 'package:hinataPicks/models/mainModels.dart';
-import 'package:hinataPicks/setting/setting.dart';
-import 'package:hinataPicks/tutorial/tutorial.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:async';
 
 class BlogPage extends StatefulWidget {
   @override
@@ -156,10 +151,8 @@ class _BlogPageState extends State<BlogPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              "${memberPremier}期生",
-              style: TextStyle(fontSize: 24.0, letterSpacing: 0.7),
-            )
+            Text(memberPremier.toString() + "期生",
+                style: TextStyle(fontSize: 24.0, letterSpacing: 0.7))
           ],
         ));
   }

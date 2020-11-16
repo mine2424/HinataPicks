@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hinataPicks/models/boardModel.dart';
-import 'package:hinataPicks/models/mainModels.dart';
+import 'package:hinataPicks/models/userModel.dart';
 import 'package:hinataPicks/setting/profile_edit.dart';
 import 'package:provider/provider.dart';
 
@@ -13,9 +13,9 @@ class _ProfilePageState extends State<ProfilePage> {
   var consumerModel;
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<BoardModel>(
-        create: (_) => BoardModel()..fetchCustomerInfo(),
-        child: Consumer<BoardModel>(builder: (context, model, child) {
+    return ChangeNotifierProvider<UserModel>(
+        create: (_) => UserModel()..fetchCustomerInfo(),
+        child: Consumer<UserModel>(builder: (context, model, child) {
           consumerModel = model.customerInfo;
           return (model.isLoading)
               ? Center(
@@ -63,7 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
       padding: const EdgeInsets.all(18.0),
       child: Text(
         'Profile',
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 35.0,
           letterSpacing: 1.5,
           color: Colors.white,
@@ -85,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
         image: DecorationImage(
             fit: BoxFit.cover,
             image: (consumerModel.imagePath == '')
-                ? AssetImage('assets/images/HinataPicks-logo-new.png')
+                ? const AssetImage('assets/images/HinataPicks-logo-new.png')
                 : NetworkImage(consumerModel.imagePath)),
       ),
     );
@@ -119,7 +119,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Text(
                   text,
-                  style: TextStyle(
+                  style: const TextStyle(
                     letterSpacing: 0.8,
                     color: Colors.blueGrey,
                     fontWeight: FontWeight.bold,
@@ -135,7 +135,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 myText,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 5,
-                style: TextStyle(
+                style: const TextStyle(
                   letterSpacing: 0.8,
                   color: Colors.blueGrey,
                   fontWeight: FontWeight.bold,

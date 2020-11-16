@@ -51,19 +51,19 @@ class _HomeSectionState extends State<HomeSection> {
       return showDialog(
           context: context,
           builder: (context) => AlertDialog(
-                title: Text('お願い'),
-                content: Text('HinataPicksの関するレビュー・ご要望等を書いていただけたら幸いです！'),
+                title: const Text('お願い'),
+                content: const Text('HinataPicksの関するレビュー・ご要望等を書いていただけたら幸いです！'),
                 actions: [
                   FlatButton(
                       onPressed: () {
                         LaunchReview.launch(iOSAppId: "1536579253");
                       },
-                      child: Text('レビューを書く')),
+                      child: const Text('レビューを書く')),
                   FlatButton(
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text('書かない'))
+                      child: const Text('書かない'))
                 ],
               ));
     }
@@ -169,7 +169,7 @@ class _HomeSectionState extends State<HomeSection> {
                 ),
                 const ListTile(
                   title: const Text(
-                    'version 1.0.6',
+                    'version 1.0.7',
                     style: TextStyle(fontSize: 20),
                   ),
                 ),
@@ -184,7 +184,8 @@ class _HomeSectionState extends State<HomeSection> {
               Align(
                   alignment: Alignment.bottomLeft,
                   child: Container(
-                    padding: EdgeInsets.only(left: 60, right: 60, bottom: 36),
+                    padding:
+                        const EdgeInsets.only(left: 60, right: 60, bottom: 36),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -201,7 +202,7 @@ class _HomeSectionState extends State<HomeSection> {
                                             .withOpacity(0.6),
                                         borderRadius:
                                             BorderRadius.circular(30)),
-                                    padding: EdgeInsets.only(
+                                    padding: const EdgeInsets.only(
                                         left: 16, right: 16, top: 8, bottom: 8),
                                     child: Row(
                                       children: [
@@ -234,18 +235,18 @@ class _HomeSectionState extends State<HomeSection> {
                                             .withOpacity(0.6),
                                         borderRadius:
                                             BorderRadius.circular(30)),
-                                    padding: EdgeInsets.only(
+                                    padding: const EdgeInsets.only(
                                         left: 16, right: 16, top: 8, bottom: 8),
                                     child: Row(
                                       children: [
-                                        Icon(
+                                        const Icon(
                                           Icons.book,
                                           color: Colors.indigo,
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           width: 8,
                                         ),
-                                        Text('ブログ',
+                                        const Text('ブログ',
                                             style: TextStyle(
                                                 color: Colors.indigo,
                                                 fontWeight: FontWeight.bold,

@@ -33,14 +33,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Color(0xff7cc8e9),
+        backgroundColor: const Color(0xff7cc8e9),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: Text('HinataPicks'),
+        title: const Text('HinataPicks'),
       ),
       body: Stack(
         alignment: Alignment.center,
@@ -108,7 +108,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               image: _image == null
                   ? (widget.costomer.imagePath != '')
                       ? NetworkImage(widget.costomer.imagePath)
-                      : AssetImage('assets/images/HinataPicks-logo-new.png')
+                      : const AssetImage(
+                          'assets/images/HinataPicks-logo-new.png')
                   : FileImage(_image)),
         ));
   }
@@ -162,7 +163,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               color: Theme.of(context).primaryColor,
             ),
             hintText: hintText,
-            hintStyle: TextStyle(
+            hintStyle: const TextStyle(
               letterSpacing: 2,
               color: Colors.blueGrey,
               fontWeight: FontWeight.bold,
@@ -198,7 +199,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   child: SizedBox(
                     height: 40,
                     child: Center(
-                      child: Text(
+                      child: const Text(
                         '画像を選択',
                         style: TextStyle(
                             fontSize: 18,
