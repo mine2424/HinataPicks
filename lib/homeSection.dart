@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hinataPicks/gameBoard/board.dart';
 import 'package:hinataPicks/gameBoard/boardSelect.dart';
 import 'package:hinataPicks/setting/profile.dart';
 import 'package:hinataPicks/setting/setting.dart';
@@ -37,37 +36,37 @@ class _HomeSectionState extends State<HomeSection> {
   @override
   initState() {
     anonymouslyLogin();
-    reviewDialog();
+    // reviewDialog();
     super.initState();
   }
 
-  Future reviewDialog() async {
-    var fetchReviewCount = await FirebaseFirestore.instance
-        .collection('customerInfo')
-        .doc(_firebaseAuth)
-        .get();
-    int reviewCount = fetchReviewCount.data()['reviewCount'];
-    if (reviewCount % 10 == 0) {
-      return showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-                title: const Text('お願い'),
-                content: const Text('HinataPicksの関するレビュー・ご要望等を書いていただけたら幸いです！'),
-                actions: [
-                  FlatButton(
-                      onPressed: () {
-                        LaunchReview.launch(iOSAppId: "1536579253");
-                      },
-                      child: const Text('レビューを書く')),
-                  FlatButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('書かない'))
-                ],
-              ));
-    }
-  }
+  // Future reviewDialog() async {
+  //   var fetchReviewCount = await FirebaseFirestore.instance
+  //       .collection('customerInfo')
+  //       .doc(_firebaseAuth)
+  //       .get();
+  //   int reviewCount = fetchReviewCount.data()['reviewCount'];
+  //   if (reviewCount % 10 == 0) {
+  //     return showDialog(
+  //         context: context,
+  //         builder: (context) => AlertDialog(
+  //               title: const Text('お願い'),
+  //               content: const Text('HinataPicksの関するレビュー・ご要望等を書いていただけたら幸いです！'),
+  //               actions: [
+  //                 FlatButton(
+  //                     onPressed: () {
+  //                       LaunchReview.launch(iOSAppId: "1536579253");
+  //                     },
+  //                     child: const Text('レビューを書く')),
+  //                 FlatButton(
+  //                     onPressed: () {
+  //                       Navigator.pop(context);
+  //                     },
+  //                     child: const Text('書かない'))
+  //               ],
+  //             ));
+  //   }
+  // }
 
   Future anonymouslyLogin() async {
     FirebaseAuth firebaseAuth = FirebaseAuth.instance;
@@ -81,12 +80,12 @@ class _HomeSectionState extends State<HomeSection> {
         print("cheked document!");
         final reviewCount = doc.data()['reviewCount'];
         if (reviewCount == null) {
-          FirebaseFirestore.instance
+          await FirebaseFirestore.instance
               .collection('customerInfo')
               .doc(firebaseAuth.currentUser.uid)
               .update({'reviewCount': 1});
         } else {
-          FirebaseFirestore.instance
+          await FirebaseFirestore.instance
               .collection('customerInfo')
               .doc(firebaseAuth.currentUser.uid)
               .update({'reviewCount': reviewCount + 1});
