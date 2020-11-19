@@ -17,7 +17,6 @@ enum BottomIcons { Blog, Video, Archive, Other }
 
 class _HomeSectionState extends State<HomeSection> {
   BottomIcons bottomIcons = BottomIcons.Video;
-  final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
 
   //外部URLへページ遷移(webviewではない)
   Future<void> _launchURL(String link) async {

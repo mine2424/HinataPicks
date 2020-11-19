@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hinataPicks/models/boardModel.dart';
 import 'package:hinataPicks/models/userModel.dart';
 import 'package:hinataPicks/setting/profile_edit.dart';
 import 'package:provider/provider.dart';
