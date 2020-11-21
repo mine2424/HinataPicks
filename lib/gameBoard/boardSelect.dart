@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:hinataPicks/gameBoard/board.dart';
+import '../importer.dart';
 
 class BoardSelect extends StatefulWidget {
   @override

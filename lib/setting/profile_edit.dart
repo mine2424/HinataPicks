@@ -1,12 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:hinataPicks/homeSection.dart';
+import '../importer.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:hinataPicks/prohibitionMatter/prohibitionWord.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 
+// ignore: must_be_immutable
 class ProfileEditPage extends StatefulWidget {
   var costomer;
 
@@ -140,6 +135,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               return '不適切な言葉が含まれています';
             }
           }
+          return null;
         },
         onSaved: (input) {
           if (hintText == '名前') {

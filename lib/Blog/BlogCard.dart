@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 var cardAspectRatio = 12.0 / 16.0;
 var widgetAspectRatio = cardAspectRatio * 1.2;
 
+// ignore: must_be_immutable
 class BlogCardWidget extends StatelessWidget {
   var allHinataBlog;
   BlogCardWidget({Key key, @required this.allHinataBlog}) : super(key: key);

@@ -1,5 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
+import '../importer.dart';
 class CustomerUser {
   String name, gameId, message, uid, twitter, imagePath;
   int like;

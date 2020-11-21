@@ -1,12 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:hinataPicks/gameBoard/boardSelect.dart';
-import 'package:hinataPicks/setting/profile.dart';
-import 'package:hinataPicks/setting/setting.dart';
-import 'package:launch_review/launch_review.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'Blog/Blog.dart';
+import 'importer.dart';
 
 class HomeSection extends StatefulWidget {
   @override
@@ -167,7 +159,7 @@ class _HomeSectionState extends State<HomeSection> {
                 ),
                 const ListTile(
                   title: const Text(
-                    'version 1.0.7',
+                    'version 1.0.8',
                     style: TextStyle(fontSize: 20),
                   ),
                 ),
@@ -179,7 +171,7 @@ class _HomeSectionState extends State<HomeSection> {
               bottomIcons == BottomIcons.Blog ? BlogPage() : Container(),
               bottomIcons == BottomIcons.Video ? BoardSelect() : Container(),
               bottomIcons == BottomIcons.Other ? ProfilePage() : Container(),
-              bottomIcons == BottomIcons.Other ? ProfilePage() : Container(),
+              // bottomIcons == BottomIcons.Other ? ProfilePage() : Container(),
               Align(
                   alignment: Alignment.bottomLeft,
                   child: Container(
@@ -221,39 +213,39 @@ class _HomeSectionState extends State<HomeSection> {
                                     ),
                                   )
                                 : Icon(Icons.chat)),
-                                GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                bottomIcons = BottomIcons.Ranking;
-                              });
-                            },
-                            child: bottomIcons == BottomIcons.Ranking
-                                ? Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.indigo.shade100
-                                            .withOpacity(0.6),
-                                        borderRadius:
-                                            BorderRadius.circular(30)),
-                                    padding: EdgeInsets.only(
-                                        left: 16, right: 16, top: 8, bottom: 8),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.stacked_bar_chart,
-                                          color: Colors.indigo,
-                                        ),
-                                        SizedBox(
-                                          width: 8,
-                                        ),
-                                        Text('ranking',
-                                            style: TextStyle(
-                                                color: Colors.indigo,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 15))
-                                      ],
-                                    ),
-                                  )
-                                : Icon(Icons.stacked_bar_chart)),
+                        //     GestureDetector(
+                        // onTap: () {
+                        //   setState(() {
+                        //     bottomIcons = BottomIcons.Ranking;
+                        //   });
+                        // },
+                        // child: bottomIcons == BottomIcons.Ranking
+                        //     ? Container(
+                        //         decoration: BoxDecoration(
+                        //             color: Colors.indigo.shade100
+                        //                 .withOpacity(0.6),
+                        //             borderRadius:
+                        //                 BorderRadius.circular(30)),
+                        //         padding: EdgeInsets.only(
+                        //             left: 16, right: 16, top: 8, bottom: 8),
+                        //         child: Row(
+                        //           children: [
+                        //             Icon(
+                        //               Icons.stacked_bar_chart,
+                        //               color: Colors.indigo,
+                        //             ),
+                        //             SizedBox(
+                        //               width: 8,
+                        //             ),
+                        //             Text('ranking',
+                        //                 style: TextStyle(
+                        //                     color: Colors.indigo,
+                        //                     fontWeight: FontWeight.bold,
+                        //                     fontSize: 15))
+                        //           ],
+                        //         ),
+                        //       )
+                        //     : Icon(Icons.stacked_bar_chart)),
                         GestureDetector(
                             onTap: () {
                               setState(() {

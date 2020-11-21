@@ -1,14 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
-import 'package:hinataPicks/homeSection.dart';
-import 'package:hinataPicks/models/userModel.dart';
-import 'package:hinataPicks/prohibitionMatter/prohibitionWord.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
+import '../importer.dart';
 
+// ignore: must_be_immutable
 class BottomAddCommentButton extends StatefulWidget {
   var chatLength;
   String collection;
@@ -74,9 +66,6 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
           context, MaterialPageRoute(builder: (context) => HomeSection()));
     }
   }
-
-  //TODO ここで関数を別ページでも使えるようにヘルパー関数を宣言する
-  // _BottomAddCommentButtonState(addComment);
 
   //外部URLへページ遷移(webviewではない)
   static _launchURL(String link) async {

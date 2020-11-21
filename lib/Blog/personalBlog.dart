@@ -1,9 +1,6 @@
-import 'dart:ui';
-import 'package:flutter/material.dart';
-import 'package:hinataPicks/models/mainModels.dart';
-import 'package:provider/provider.dart';
-import 'blogWebview.dart';
+import '../importer.dart';
 
+// ignore: must_be_immutable
 class PersonalBlogPage extends StatefulWidget {
   var profile, allHinataBlog;
   PersonalBlogPage(

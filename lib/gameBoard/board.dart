@@ -1,16 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
 import 'package:hinataPicks/gameBoard/board_user_info.dart';
-import 'package:hinataPicks/gameBoard/bottomAddCommentButton.dart';
-import 'package:hinataPicks/homeSection.dart';
-import 'package:hinataPicks/prohibitionMatter/prohibitionWord.dart';
-import 'package:hinataPicks/setting/setting.dart';
-import 'package:selectable_autolink_text/selectable_autolink_text.dart';
-import 'package:share/share.dart';
-import 'package:url_launcher/url_launcher.dart';
+import '../importer.dart';
 
+// ignore: must_be_immutable
 class BoardPage extends StatefulWidget {
   var collection, addComment;
   BoardPage({Key key, @required this.collection}) : super(key: key);
@@ -92,6 +83,11 @@ class BoardPageState extends State<BoardPage> {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => HomeSection()));
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -303,7 +299,7 @@ class BoardPageState extends State<BoardPage> {
                                     key: _formKey,
                                     child: Column(
                                       children: [
-                                        Text('${myname}に返信'),
+                                        Text(myname + 'に返信'),
                                         TextFormField(
                                           keyboardType: TextInputType.multiline,
                                           maxLines: null,

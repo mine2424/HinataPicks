@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:hinataPicks/models/userModel.dart';
-import 'package:provider/provider.dart';
-
+import '../importer.dart';
+// ignore: must_be_immutable
 class BoardUserInfoPage extends StatefulWidget {
   var userUid;
   BoardUserInfoPage({Key key, this.userUid}) : super(key: key);

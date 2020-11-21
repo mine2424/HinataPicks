@@ -1,12 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:getwidget/getwidget.dart';
-import 'package:hinataPicks/Blog/BlogCard.dart';
-import 'package:hinataPicks/Blog/blogWebview.dart';
-import 'package:hinataPicks/Blog/personalBlog.dart';
-import 'package:hinataPicks/classes/member.dart';
-import 'package:hinataPicks/models/mainModels.dart';
-import 'package:provider/provider.dart';
+import '../importer.dart';
 
 class BlogPage extends StatefulWidget {
   @override
@@ -38,6 +30,11 @@ class _BlogPageState extends State<BlogPage> {
   // }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ChangeNotifierProvider<MainModel>(
@@ -45,8 +42,6 @@ class _BlogPageState extends State<BlogPage> {
         child: Consumer<MainModel>(builder: (context, model, child) {
           this.allHinataBlog = model.allHinataBlog;
           return SingleChildScrollView(
-              // TODO お気に入りメンバーの登録 || それのみ表示
-              // TODO 匿名ログインが必要になる
               child: Column(
             children: [
               const SizedBox(height: 20),

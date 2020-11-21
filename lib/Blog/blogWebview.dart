@@ -1,12 +1,10 @@
-import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
 import 'package:image_picker_saver/image_picker_saver.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
+import '../importer.dart';
+import 'package:http/http.dart' as http;
+
+
+// ignore: must_be_immutable
 class BlogWebView extends StatefulWidget {
   var blogData;
   BlogWebView({Key key, @required this.blogData}) : super(key: key);
