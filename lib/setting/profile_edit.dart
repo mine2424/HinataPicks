@@ -68,7 +68,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     _profileText(),
                     _circleAvatar(),
                     _textListCalling(),
-                    const SizedBox(height: 120)
+                    const SizedBox(height: 500)
                   ],
                 ),
               ],
@@ -310,7 +310,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   }
 
   Future getImageFromGallery() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    final pickedFile =
+        await picker.getImage(source: ImageSource.gallery, imageQuality: 60);
 
     setState(() {
       _image = File(pickedFile.path);

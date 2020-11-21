@@ -13,10 +13,11 @@ class HomeSection extends StatefulWidget {
   _HomeSectionState createState() => _HomeSectionState();
 }
 
-enum BottomIcons { Blog, Video, Archive, Other }
+enum BottomIcons { Blog, Video, Ranking, Other }
 
 class _HomeSectionState extends State<HomeSection> {
   BottomIcons bottomIcons = BottomIcons.Video;
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
   //外部URLへページ遷移(webviewではない)
   Future<void> _launchURL(String link) async {
@@ -35,46 +36,17 @@ class _HomeSectionState extends State<HomeSection> {
   @override
   initState() {
     anonymouslyLogin();
-    // reviewDialog();
+    reviewDialog();
     super.initState();
   }
 
-  // Future reviewDialog() async {
-  //   var fetchReviewCount = await FirebaseFirestore.instance
-  //       .collection('customerInfo')
-  //       .doc(_firebaseAuth)
-  //       .get();
-  //   int reviewCount = fetchReviewCount.data()['reviewCount'];
-  //   if (reviewCount % 10 == 0) {
-  //     return showDialog(
-  //         context: context,
-  //         builder: (context) => AlertDialog(
-  //               title: const Text('お願い'),
-  //               content: const Text('HinataPicksの関するレビュー・ご要望等を書いていただけたら幸いです！'),
-  //               actions: [
-  //                 FlatButton(
-  //                     onPressed: () {
-  //                       LaunchReview.launch(iOSAppId: "1536579253");
-  //                     },
-  //                     child: const Text('レビューを書く')),
-  //                 FlatButton(
-  //                     onPressed: () {
-  //                       Navigator.pop(context);
-  //                     },
-  //                     child: const Text('書かない'))
-  //               ],
-  //             ));
-  //   }
-  // }
-
   Future anonymouslyLogin() async {
-    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
     await firebaseAuth.signInAnonymously();
     final doc = FirebaseFirestore.instance
         .collection('customerInfo')
         .doc(firebaseAuth.currentUser.uid)
         .get();
-    doc.then((doc) async {
+    await doc.then((doc) async {
       if (doc.exists) {
         print("cheked document!");
         final reviewCount = doc.data()['reviewCount'];
@@ -108,6 +80,34 @@ class _HomeSectionState extends State<HomeSection> {
         });
       }
     });
+  }
+
+  Future reviewDialog() async {
+    var fetchReviewCount = await FirebaseFirestore.instance
+        .collection('customerInfo')
+        .doc(firebaseAuth.currentUser.uid)
+        .get();
+    int reviewCount = fetchReviewCount.data()['reviewCount'];
+    if (reviewCount % 10 == 0) {
+      return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: const Text('お願い'),
+                content: const Text('HinataPicksの関するレビュー・ご要望等を書いていただけたら幸いです！'),
+                actions: [
+                  FlatButton(
+                      onPressed: () {
+                        LaunchReview.launch(iOSAppId: "1536579253");
+                      },
+                      child: const Text('レビューを書く')),
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('書かない'))
+                ],
+              ));
+    }
   }
 
   @override
@@ -179,6 +179,7 @@ class _HomeSectionState extends State<HomeSection> {
               bottomIcons == BottomIcons.Blog ? BlogPage() : Container(),
               bottomIcons == BottomIcons.Video ? BoardSelect() : Container(),
               bottomIcons == BottomIcons.Other ? ProfilePage() : Container(),
+              bottomIcons == BottomIcons.Other ? ProfilePage() : Container(),
               Align(
                   alignment: Alignment.bottomLeft,
                   child: Container(
@@ -220,6 +221,39 @@ class _HomeSectionState extends State<HomeSection> {
                                     ),
                                   )
                                 : Icon(Icons.chat)),
+                                GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                bottomIcons = BottomIcons.Ranking;
+                              });
+                            },
+                            child: bottomIcons == BottomIcons.Ranking
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.indigo.shade100
+                                            .withOpacity(0.6),
+                                        borderRadius:
+                                            BorderRadius.circular(30)),
+                                    padding: EdgeInsets.only(
+                                        left: 16, right: 16, top: 8, bottom: 8),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.stacked_bar_chart,
+                                          color: Colors.indigo,
+                                        ),
+                                        SizedBox(
+                                          width: 8,
+                                        ),
+                                        Text('ranking',
+                                            style: TextStyle(
+                                                color: Colors.indigo,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15))
+                                      ],
+                                    ),
+                                  )
+                                : Icon(Icons.stacked_bar_chart)),
                         GestureDetector(
                             onTap: () {
                               setState(() {

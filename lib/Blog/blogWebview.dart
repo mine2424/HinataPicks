@@ -1,5 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:image_picker_saver/image_picker_saver.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class BlogWebView extends StatefulWidget {
@@ -36,20 +41,64 @@ class _BlogWebViewState extends State<BlogWebView> {
         elevation: 0,
         brightness: Brightness.light,
         centerTitle: true,
+        actions: [
+          PopupMenuButton<String>(
+            key: GlobalKey(),
+            itemBuilder: (BuildContext context) {
+              count = 0;
+              return _imageSelects.map((s) {
+                count += 1;
+                return PopupMenuItem(
+                  key: GlobalKey(),
+                  child: (s == null)
+                      ? const Text('画像がありません')
+                      : FlatButton(
+                          onPressed: () {
+                            saveImage(s);
+                            showDialog(
+                              context: context,
+                              builder: (_) {
+                                return AlertDialog(
+                                  content: const Text("画像を保存しました"),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: const Text("OK"),
+                                      onPressed: () => Navigator.pop(context),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              Image(
+                                  image: NetworkImage(s),
+                                  fit: BoxFit.cover,
+                                  height: 46),
+                              const SizedBox(width: 10),
+                              Text('画像$count'),
+                            ],
+                          )),
+                  value: s,
+                );
+              }).toList();
+            },
+          )
+        ],
       ),
       body: WebView(
         key: GlobalKey(),
         initialUrl: widget.blogData["href"],
-        javascriptMode: JavascriptMode.unrestricted,
       ),
     );
   }
 
-  // void getImage(url) async {
-  //   var response = await http.get(url);
-  //   var filePath =
-  //       await ImagePickerSaver.saveFile(fileData: response.bodyBytes);
-  //   var savedFile = File.fromUri(Uri.file(filePath));
-  //   print(savedFile);
-  // }
+  void saveImage(url) async {
+    var response = await http.get(url);
+    var filePath =
+        await ImagePickerSaver.saveFile(fileData: response.bodyBytes);
+    var savedFile = File.fromUri(Uri.file(filePath));
+    print(savedFile);
+  }
 }
