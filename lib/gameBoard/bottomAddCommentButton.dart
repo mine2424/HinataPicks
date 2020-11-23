@@ -38,12 +38,12 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
           .get();
       //投稿するユーザーの画像の判別
       if (sendUserInfoDoc.data()['imagePath'] == null) {
-        FirebaseFirestore.instance
+        await FirebaseFirestore.instance
             .collection('customerInfo')
             .doc(_firebaseAuth)
             .update({'imagePath': ''});
       } else {
-        userImage = sendUserInfoDoc.data()['imagePath'];
+        userImage = await sendUserInfoDoc.data()['imagePath'];
       }
       //投稿するユーザーの名前の判別
       if (customerModel.name == '') {
@@ -53,7 +53,7 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
         userName = customerModel.name;
       }
 
-      sendComment.doc((commentLength.docs.length + 1).toString()).set({
+      await sendComment.doc((commentLength.docs.length + 1).toString()).set({
         'userUid': _firebaseAuth,
         'name': userName,
         'context': content,

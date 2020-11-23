@@ -159,7 +159,7 @@ class _HomeSectionState extends State<HomeSection> {
                 ),
                 const ListTile(
                   title: const Text(
-                    'version 1.0.8',
+                    'version 1.1.0',
                     style: TextStyle(fontSize: 20),
                   ),
                 ),
@@ -170,8 +170,10 @@ class _HomeSectionState extends State<HomeSection> {
             children: [
               bottomIcons == BottomIcons.Blog ? BlogPage() : Container(),
               bottomIcons == BottomIcons.Video ? BoardSelect() : Container(),
+              bottomIcons == BottomIcons.Ranking
+                  ? StrategyHomePage()
+                  : Container(),
               bottomIcons == BottomIcons.Other ? ProfilePage() : Container(),
-              // bottomIcons == BottomIcons.Other ? ProfilePage() : Container(),
               Align(
                   alignment: Alignment.bottomLeft,
                   child: Container(
@@ -213,39 +215,39 @@ class _HomeSectionState extends State<HomeSection> {
                                     ),
                                   )
                                 : Icon(Icons.chat)),
-                        //     GestureDetector(
-                        // onTap: () {
-                        //   setState(() {
-                        //     bottomIcons = BottomIcons.Ranking;
-                        //   });
-                        // },
-                        // child: bottomIcons == BottomIcons.Ranking
-                        //     ? Container(
-                        //         decoration: BoxDecoration(
-                        //             color: Colors.indigo.shade100
-                        //                 .withOpacity(0.6),
-                        //             borderRadius:
-                        //                 BorderRadius.circular(30)),
-                        //         padding: EdgeInsets.only(
-                        //             left: 16, right: 16, top: 8, bottom: 8),
-                        //         child: Row(
-                        //           children: [
-                        //             Icon(
-                        //               Icons.stacked_bar_chart,
-                        //               color: Colors.indigo,
-                        //             ),
-                        //             SizedBox(
-                        //               width: 8,
-                        //             ),
-                        //             Text('ranking',
-                        //                 style: TextStyle(
-                        //                     color: Colors.indigo,
-                        //                     fontWeight: FontWeight.bold,
-                        //                     fontSize: 15))
-                        //           ],
-                        //         ),
-                        //       )
-                        //     : Icon(Icons.stacked_bar_chart)),
+                        GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                bottomIcons = BottomIcons.Ranking;
+                              });
+                            },
+                            child: bottomIcons == BottomIcons.Ranking
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.indigo.shade100
+                                            .withOpacity(0.6),
+                                        borderRadius:
+                                            BorderRadius.circular(30)),
+                                    padding: EdgeInsets.only(
+                                        left: 16, right: 16, top: 8, bottom: 8),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.new_releases,
+                                          color: Colors.indigo,
+                                        ),
+                                        SizedBox(
+                                          width: 8,
+                                        ),
+                                        Text('ひなこい',
+                                            style: TextStyle(
+                                                color: Colors.indigo,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15))
+                                      ],
+                                    ),
+                                  )
+                                : Icon(Icons.new_releases)),
                         GestureDetector(
                             onTap: () {
                               setState(() {

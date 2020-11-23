@@ -55,22 +55,22 @@ class BoardPageState extends State<BoardPage> {
           .get();
 
       if (sendUserInfoDoc.data()['imagePath'] == null) {
-        FirebaseFirestore.instance
+        await FirebaseFirestore.instance
             .collection('customerInfo')
             .doc(_firebaseAuth)
             .update({'imagePath': ''});
       } else {
-        userImage = sendUserInfoDoc.data()['imagePath'];
+        userImage = await sendUserInfoDoc.data()['imagePath'];
       }
 
       if (sendUserInfoDoc.data()['insta'] == '') {
         userName =
             '匿名おひさまさん(${sendUserInfoDoc.data()['uid'].toString().substring(0, 7)})';
       } else {
-        userName = sendUserInfoDoc.data()['insta'];
+        userName = await sendUserInfoDoc.data()['insta'];
       }
 
-      sendComment.doc((commentLength.docs.length + 1).toString()).set({
+      await sendComment.doc((commentLength.docs.length + 1).toString()).set({
         'userUid': _firebaseAuth,
         'name': userName,
         'context': content,

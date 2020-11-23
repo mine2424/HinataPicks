@@ -31,5 +31,6 @@ export 'package:hinataPicks/models/userModel.dart';
 export 'package:hinataPicks/Blog/personalBlog.dart';
 export 'package:hinataPicks/models/mainModels.dart';
 export 'package:hinataPicks/gameBoard/boardSelect.dart';
+export 'package:hinataPicks/strategy/strategy_home.dart';
 export 'package:hinataPicks/gameBoard/bottomAddCommentButton.dart';
 export 'package:hinataPicks/prohibitionMatter/prohibitionWord.dart';
