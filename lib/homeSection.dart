@@ -154,7 +154,9 @@ class _HomeSectionState extends State<HomeSection> {
                     style: TextStyle(fontSize: 20),
                   ),
                   onTap: () {
-                    LaunchReview.launch(iOSAppId: "1536579253");
+                    LaunchReview.launch(
+                        iOSAppId: "1536579253",
+                        androidAppId: 'app.mine.hinataPicks');
                   },
                 ),
                 const ListTile(
