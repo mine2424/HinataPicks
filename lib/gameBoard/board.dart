@@ -258,6 +258,9 @@ class BoardPageState extends State<BoardPage> {
                                           return child;
                                         return Center(
                                           child: CircularProgressIndicator(
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    Colors.white),
                                             value: loadingProgress
                                                         .expectedTotalBytes !=
                                                     null
