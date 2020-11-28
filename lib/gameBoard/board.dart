@@ -13,7 +13,8 @@ class BoardPage extends StatefulWidget {
 class BoardPageState extends State<BoardPage> {
   List chatsList = [];
   String content;
-  var _messageCautionsList = ['ブロック', '報告'];
+  bool isLike = true;
+  var _messageCautionsList = ['ブロック', '報告', '削除'];
   //TODO シングルトン化してコードの省略
   final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
   var chatLength, customerImagePath;
@@ -94,58 +95,57 @@ class BoardPageState extends State<BoardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: BottomAddCommentButton(
-            collection: widget.collection,
-            chatLength: chatLength,
-            sendUser: ''),
-        body: StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection(widget.collection)
-                .orderBy('createAt', descending: true)
-                .limit(160)
-                .snapshots(),
-            builder: (context, snapshot) {
-              return (!snapshot.hasData)
+      floatingActionButton: BottomAddCommentButton(
+          collection: widget.collection, chatLength: chatLength, sendUser: ''),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection(widget.collection)
+            .orderBy('createAt', descending: true)
+            .limit(160)
+            .snapshots(),
+        builder: (context, snapshot) {
+          return (!snapshot.hasData)
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Now Loading...',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w300))
+                    ],
+                  ),
+                )
+              : (snapshot.data.docs.length == 0)
                   ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text('Now Loading...',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.w300))
+                          (widget.collection == 'friendChats')
+                              ? Image.asset('assets/images/chat-hinakoi.png',
+                                  scale: 1.4)
+                              : Image.asset('assets/images/chat-normal.png',
+                                  scale: 1.4),
+                          SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.2)
                         ],
                       ),
                     )
-                  : (snapshot.data.docs.length == 0)
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              (widget.collection == 'friendChats')
-                                  ? Image.asset(
-                                      'assets/images/chat-hinakoi.png',
-                                      scale: 1.4)
-                                  : Image.asset('assets/images/chat-normal.png',
-                                      scale: 1.4),
-                              SizedBox(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.2)
-                            ],
-                          ),
-                        )
-                      : ListView.builder(
-                          itemCount: snapshot.data.docs.length,
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          itemBuilder: (BuildContext context, int index) {
-                            final chatsItem = snapshot.data.docs[index];
-                            chatLength = snapshot.data.docs.length;
-                            DateTime createdTime =
-                                chatsItem.data()['createAt'].toDate();
-                            return (chatsItem.data()['name'] == '運営')
-                                ? commentBox(chatsItem, createdTime, 'admin')
-                                : commentBox(chatsItem, createdTime, '');
-                          });
-            }));
+                  : ListView.builder(
+                      itemCount: snapshot.data.docs.length,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemBuilder: (BuildContext context, int index) {
+                        final chatsItem = snapshot.data.docs[index];
+                        chatLength = snapshot.data.docs.length;
+                        DateTime createdTime =
+                            chatsItem.data()['createAt'].toDate();
+                        return (chatsItem.data()['name'] == '運営')
+                            ? commentBox(chatsItem, createdTime, 'admin')
+                            : commentBox(chatsItem, createdTime, '');
+                      },
+                    );
+        },
+      ),
+    );
   }
 
   Widget commentBox(chatsItem, createdTime, isAdmin) {
@@ -179,259 +179,312 @@ class BoardPageState extends State<BoardPage> {
           children: [
             const SizedBox(height: 15),
             Container(
-              margin: const EdgeInsets.only(bottom: 5, left: 3),
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-              decoration: BoxDecoration(
-                color: (isAdmin == 'admin')
-                    ? Colors.red[300]
-                    : (chatsItem.data()['returnName'] != null)
-                        ? Color(0xff99FF73)
-                        : Color(0xff7cc8e9),
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                  bottomLeft: Radius.circular(20),
+                margin: const EdgeInsets.only(top: 5, bottom: 5, left: 3),
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                decoration: BoxDecoration(
+                  color: (isAdmin == 'admin')
+                      ? Colors.red[300]
+                      : (chatsItem.data()['returnName'] != null)
+                          ? Color(0xff99FF73)
+                          : Color(0xff7cc8e9),
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                    bottomLeft: Radius.circular(20),
+                  ),
                 ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [
                   SizedBox(height: 10),
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        chatsItem.data()['name'],
-                        style: TextStyle(
-                            color: (isAdmin == 'admin')
-                                ? Colors.black
-                                : Colors.blueGrey,
-                            fontSize: 13.2,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.52,
-                        child: (chatsItem.data()['returnName'] != null)
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '@' + chatsItem.data()['returnName'],
-                                    style: const TextStyle(
-                                      color: Colors.blue,
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.w300,
-                                    ),
-                                  ),
-                                  _selectableTextContent(chatsItem),
-                                ],
-                              )
-                            : _selectableTextContent(chatsItem),
-                      ),
-                      const SizedBox(height: 5),
-                      (chatsItem.data()['postImage'] != null)
-                          ? Stack(
-                              children: [
-                                GestureDetector(
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => BoardDetailsImage(
-                                        image: chatsItem.data()['postImage'],
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          chatsItem.data()['name'],
+                          style: TextStyle(
+                              color: (isAdmin == 'admin')
+                                  ? Colors.black
+                                  : Colors.blueGrey,
+                              fontSize: 13.2,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.52,
+                          child: (chatsItem.data()['returnName'] != null)
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '@' + chatsItem.data()['returnName'],
+                                      style: const TextStyle(
+                                        color: Colors.blue,
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w300,
                                       ),
                                     ),
-                                  ),
-                                  child: Hero(
-                                    tag: 'imageTag',
-                                    child: Image.network(
-                                      chatsItem.data()['postImage'],
-                                      filterQuality: FilterQuality.medium,
-                                      fit: BoxFit.cover,
-                                      width: MediaQuery.of(context).size.width *
-                                          0.55,
-                                      loadingBuilder:
-                                          (context, child, loadingProgress) {
-                                        if (loadingProgress == null)
-                                          return child;
-                                        return Center(
-                                          child: CircularProgressIndicator(
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                                    Colors.white),
-                                            value: loadingProgress
-                                                        .expectedTotalBytes !=
-                                                    null
-                                                ? loadingProgress
-                                                        .cumulativeBytesLoaded /
-                                                    loadingProgress
-                                                        .expectedTotalBytes
-                                                : null,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
-                          : const SizedBox(),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 4,
-                horizontal: 16,
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    createdTime.toLocal().toString().substring(
-                          0,
-                          createdTime.toLocal().toString().length - 10,
+                                    _selectableTextContent(chatsItem),
+                                  ],
+                                )
+                              : _selectableTextContent(chatsItem),
                         ),
-                    style: const TextStyle(
-                      color: Colors.blueGrey,
-                      fontSize: 12.6,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(width: 28),
-                  Text(
-                    '返信',
-                    style: TextStyle(
-                      color: Colors.blueGrey,
-                      fontSize: 12.2,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: BoxConstraints(),
-                    icon: Icon(
-                      Icons.reply,
-                      size: 20,
-                    ),
-                    color: Colors.grey,
-                    onPressed: () {
-                      var myname = chatsItem.data()['name'];
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('返信'),
-                          content: SingleChildScrollView(
-                            child: Form(
-                              key: _formKey,
-                              child: Column(
-                                children: [
-                                  Text(myname + 'に返信'),
-                                  TextFormField(
-                                    keyboardType: TextInputType.multiline,
-                                    maxLines: null,
-                                    validator: (input) {
-                                      for (var i = 0;
-                                          i < prohibisionWords.length;
-                                          i++) {
-                                        if (input
-                                            .contains(prohibisionWords[i])) {
-                                          return '不適切な言葉が含まれています';
-                                        }
-                                        if (input.isEmpty) {
-                                          return '投稿内容を入力してください';
-                                        }
-                                      }
-                                      return null;
-                                    },
-                                    onSaved: (input) => content = input,
-                                    decoration: const InputDecoration(
-                                        labelText: '投稿内容'),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              createdTime.toLocal().toString().substring(
+                                    0,
+                                    createdTime.toLocal().toString().length -
+                                        10,
                                   ),
-                                  const SizedBox(height: 15),
-                                  RichText(
-                                    text: TextSpan(
-                                      children: [
-                                        TextSpan(
-                                          text: '投稿すると',
-                                          style: TextStyle(
-                                              color: Colors.grey[800]),
-                                        ),
-                                        TextSpan(
-                                          text: '利用規約',
-                                          style: TextStyle(
-                                              color: Colors.lightBlue),
-                                          recognizer: _recognizer,
-                                        ),
-                                        TextSpan(
-                                          text: 'に同意したものとみなします。',
-                                          style: TextStyle(
-                                              color: Colors.grey[800]),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
+                              style: const TextStyle(
+                                color: Colors.blueGrey,
+                                fontSize: 11,
+                                // fontWeight: FontWeight,
                               ),
-                            ),
-                          ),
-                          actions: [
-                            FlatButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('キャンセル')),
-                            FlatButton(
-                              onPressed: () {
-                                replyComment(widget.collection,
-                                    chatsItem.data()['name']);
-                              },
-                              child: const Text('返信'),
                             ),
                           ],
                         ),
-                      );
-                    },
+                        (chatsItem.data()['postImage'] != null)
+                            ? Stack(children: [
+                                GestureDetector(
+                                    onTap: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                BoardDetailsImage(
+                                              image:
+                                                  chatsItem.data()['postImage'],
+                                            ),
+                                          ),
+                                        ),
+                                    child: Hero(
+                                        tag: 'imageTag',
+                                        child: Image.network(
+                                            chatsItem.data()['postImage'],
+                                            filterQuality: FilterQuality.medium,
+                                            fit: BoxFit.cover,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.55,
+                                            loadingBuilder: (context, child,
+                                                loadingProgress) {
+                                          if (loadingProgress == null)
+                                            return child;
+                                          return Center(
+                                              child: CircularProgressIndicator(
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                          Color>(Colors.white),
+                                                  value: loadingProgress
+                                                              .expectedTotalBytes !=
+                                                          null
+                                                      ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          loadingProgress
+                                                              .expectedTotalBytes
+                                                      : null));
+                                        })))
+                              ])
+                            : const SizedBox()
+                      ])
+                ])),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const SizedBox(width: 8),
+                // const Text(
+                //   'いいね',
+                //   style: TextStyle(
+                //     color: Colors.blueGrey,
+                //     fontSize: 12.2,
+                //     fontWeight: FontWeight.normal,
+                //   ),
+                // ),
+                IconButton(
+                    padding: EdgeInsets.all(4.0),
+                    constraints: BoxConstraints(),
+                    icon: Icon(
+                      Icons.thumb_up,
+                      size: 24,
+                    ),
+                    color: Colors.grey,
+                    onPressed: () async {
+                      final likeDoc = FirebaseFirestore.instance
+                          .collection(widget.collection)
+                          .doc(chatsItem.id.toString());
+                      final fetchLike = await likeDoc.get();
+                      final userDoc = FirebaseFirestore.instance
+                          .collection('customerInfo')
+                          .doc(_firebaseAuth);
+                      final fetchUserlike = await userDoc.get();
+                      if (isLike) {
+                        likeDoc.update({'like': fetchLike.data()['like'] + 1});
+                        userDoc
+                            .update({'like': fetchUserlike.data()['like'] + 1});
+                        setState(() {
+                          isLike = false;
+                        });
+                      } else {
+                        likeDoc.update({'like': fetchLike.data()['like'] - 1});
+                        userDoc
+                            .update({'like': fetchUserlike.data()['like'] - 1});
+                        setState(() {
+                          isLike = true;
+                        });
+                      }
+                    }),
+                Text(
+                  chatsItem.data()['like'].toString(),
+                  style: TextStyle(
+                    color: Colors.blueGrey,
+                    fontSize: 12.2,
+                    fontWeight: FontWeight.normal,
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  '返信',
+                  style: TextStyle(
+                    color: Colors.blueGrey,
+                    fontSize: 12.2,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(),
+                  icon: Icon(
+                    Icons.reply,
+                    size: 20,
+                  ),
+                  color: Colors.grey,
+                  onPressed: () {
+                    var myname = chatsItem.data()['name'];
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('返信'),
+                        content: SingleChildScrollView(
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              children: [
+                                Text(myname + 'に返信'),
+                                TextFormField(
+                                  keyboardType: TextInputType.multiline,
+                                  maxLines: null,
+                                  validator: (input) {
+                                    for (var i = 0;
+                                        i < prohibisionWords.length;
+                                        i++) {
+                                      if (input.contains(prohibisionWords[i])) {
+                                        return '不適切な言葉が含まれています';
+                                      }
+                                      if (input.isEmpty) {
+                                        return '投稿内容を入力してください';
+                                      }
+                                    }
+                                    return null;
+                                  },
+                                  onSaved: (input) => content = input,
+                                  decoration:
+                                      const InputDecoration(labelText: '投稿内容'),
+                                ),
+                                const SizedBox(height: 15),
+                                RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: '投稿すると',
+                                        style:
+                                            TextStyle(color: Colors.grey[800]),
+                                      ),
+                                      TextSpan(
+                                        text: '利用規約',
+                                        style:
+                                            TextStyle(color: Colors.lightBlue),
+                                        recognizer: _recognizer,
+                                      ),
+                                      TextSpan(
+                                        text: 'に同意したものとみなします。',
+                                        style:
+                                            TextStyle(color: Colors.grey[800]),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        actions: [
+                          FlatButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('キャンセル')),
+                          FlatButton(
+                            onPressed: () {
+                              replyComment(
+                                  widget.collection, chatsItem.data()['name']);
+                            },
+                            child: const Text('返信'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
             )
           ],
         ),
         PopupMenuButton<String>(
-            icon: Icon(
-              Icons.sms_failed_outlined,
-              size: 23,
-            ),
-            itemBuilder: (BuildContext context) {
-              return _messageCautionsList.map((String s) {
-                return PopupMenuItem(
-                  child: FlatButton(
-                      onPressed: () {
-                        if (s == 'ブロック') {
-                          blockDialog(chatsItem);
-                        }
-                        if (s == '報告') {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SettingPage()));
-                        }
-                      },
-                      child: Text(s)),
-                  value: s,
-                );
-              }).toList();
-            })
+          icon: Icon(
+            Icons.sms_failed_outlined,
+            size: 23,
+          ),
+          itemBuilder: (BuildContext context) {
+            return _messageCautionsList.map((String s) {
+              return PopupMenuItem(
+                child: FlatButton(
+                    onPressed: () {
+                      if (s == 'ブロック') {
+                        blockDialog(chatsItem);
+                      }
+                      if (s == '報告') {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SettingPage()));
+                      }
+                      if (s == '削除' &&
+                          _firebaseAuth == chatsItem.data()['userUid']) {
+                        _rmCommentMyself(chatsItem.id);
+                      }
+                    },
+                    child: (_firebaseAuth == chatsItem.data()['userUid'])
+                        ? Text(s)
+                        : (s == '削除')
+                            ? null
+                            : Text(s)),
+                value: s,
+              );
+            }).toList();
+          },
+        ),
       ],
     );
   }
 
-  Future removeComment(String nowUser) async {
+  Future removeComment(String nowComment) async {
     await FirebaseFirestore.instance
         .collection(widget.collection)
-        .doc(nowUser)
+        .doc(nowComment)
         .delete();
     return Navigator.pop(context);
   }
@@ -453,6 +506,28 @@ class BoardPageState extends State<BoardPage> {
       ),
       onTap: (url) => _launchURL(url),
       onLongPress: (url) => Share.share(url),
+    );
+  }
+
+  _rmCommentMyself(nowComment) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('確認'),
+          content: Text('本当に削除しますか？(自分の投稿したものしか削除できません)'),
+          actions: [
+            FlatButton(
+              onPressed: () => removeComment(nowComment),
+              child: Text('はい'),
+            ),
+            FlatButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('いいえ'),
+            ),
+          ],
+        );
+      },
     );
   }
 

@@ -163,7 +163,11 @@ class _ProfilePageState extends State<ProfilePage> {
               myText: consumerModel.gameId,
               icon: Icons.gamepad),
           const SizedBox(height: 16),
-          _textList(text: 'いいね', myText: '準備中', icon: Icons.thumb_up),
+          _textList(
+            text: 'いいね',
+            myText: consumerModel.like.toString(),
+            icon: Icons.thumb_up,
+          ),
           const SizedBox(height: 16),
           _textList(
               text: 'メッセージ',

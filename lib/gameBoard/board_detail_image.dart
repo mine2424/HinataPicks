@@ -13,7 +13,6 @@ class BoardDetailsImage extends StatelessWidget {
             backgroundColor: Colors.transparent,
             elevation: 0.0,
             leading: Padding(
-              // --> Custom Back Button
               padding: const EdgeInsets.all(8.0),
               child: FloatingActionButton(
                 backgroundColor: Colors.transparent,
