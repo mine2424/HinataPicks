@@ -161,7 +161,7 @@ class _HomeSectionState extends State<HomeSection> {
                 ),
                 const ListTile(
                   title: const Text(
-                    'version 1.1.0',
+                    'version 1.1.1',
                     style: TextStyle(fontSize: 20),
                   ),
                 ),
