@@ -149,6 +149,13 @@ class BoardPageState extends State<BoardPage> {
   }
 
   Widget commentBox(chatsItem, createdTime, isAdmin) {
+    final likeDoc = FirebaseFirestore.instance
+        .collection(widget.collection)
+        .doc(chatsItem.id.toString());
+
+    final userDoc = FirebaseFirestore.instance
+        .collection('customerInfo')
+        .doc(_firebaseAuth);
     return Row(
       children: [
         FlatButton(
@@ -298,14 +305,6 @@ class BoardPageState extends State<BoardPage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 const SizedBox(width: 8),
-                // const Text(
-                //   'いいね',
-                //   style: TextStyle(
-                //     color: Colors.blueGrey,
-                //     fontSize: 12.2,
-                //     fontWeight: FontWeight.normal,
-                //   ),
-                // ),
                 IconButton(
                     padding: EdgeInsets.all(4.0),
                     constraints: BoxConstraints(),
@@ -315,16 +314,11 @@ class BoardPageState extends State<BoardPage> {
                     ),
                     color: Colors.grey,
                     onPressed: () async {
-                      final likeDoc = FirebaseFirestore.instance
-                          .collection(widget.collection)
-                          .doc(chatsItem.id.toString());
                       final fetchLike = await likeDoc.get();
-                      final userDoc = FirebaseFirestore.instance
-                          .collection('customerInfo')
-                          .doc(_firebaseAuth);
                       final fetchUserlike = await userDoc.get();
                       if (isLike) {
                         likeDoc.update({'like': fetchLike.data()['like'] + 1});
+                        likeDoc.update({'isLike': false});
                         userDoc
                             .update({'like': fetchUserlike.data()['like'] + 1});
                         setState(() {
@@ -332,6 +326,7 @@ class BoardPageState extends State<BoardPage> {
                         });
                       } else {
                         likeDoc.update({'like': fetchLike.data()['like'] - 1});
+                        likeDoc.update({'isLike': true});
                         userDoc
                             .update({'like': fetchUserlike.data()['like'] - 1});
                         setState(() {
