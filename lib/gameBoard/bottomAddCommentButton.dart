@@ -86,13 +86,32 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
       _launchURL('https://hinatapicks.web.app/');
     };
 
-  Future getImageFromGallery() async {
+  Future<void> getImageFromGallery() async {
     final pickedFile =
         await picker.getImage(source: ImageSource.gallery, imageQuality: 60);
 
     setState(() {
       _image = File(pickedFile.path);
     });
+    // if (_image == null) {
+    //   await retrieveLostData();
+    // }
+  }
+
+  Future<void> retrieveLostData() async {
+    LostData response = await picker.getLostData();
+
+    if (response.isEmpty) {
+      return;
+    }
+    if (response.file != null) {
+      setState(() {
+        _image = File(response.file.toString());
+      });
+    } else {
+      var _retrieveDataError = response.exception.code;
+      print('RETRIEVE ERROR: ' + _retrieveDataError);
+    }
   }
 
   addComment(collection, customerModel) async {
@@ -135,8 +154,8 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
         'context': content,
         'like': 0,
         'imagePath': userImage,
-        'postImage': postImage,
         'createAt': Timestamp.now(),
+        'postImage': postImage,
       });
 
       //投稿する画像があったらfirebase storegeに送信する

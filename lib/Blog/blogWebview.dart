@@ -3,7 +3,6 @@ import 'package:image_picker_saver/image_picker_saver.dart';
 import '../importer.dart';
 import 'package:http/http.dart' as http;
 
-
 // ignore: must_be_immutable
 class BlogWebView extends StatefulWidget {
   var blogData;

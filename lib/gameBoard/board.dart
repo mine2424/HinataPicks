@@ -42,9 +42,9 @@ class BoardPageState extends State<BoardPage> {
 
   replyComment(collection, replyName) async {
     if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
       String userName, userImage = '';
       final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
-      _formKey.currentState.save();
       // 各boardのcollectionを取得
       final sendComment = FirebaseFirestore.instance.collection(collection);
       // boradのコメントの個数を取得
@@ -79,7 +79,8 @@ class BoardPageState extends State<BoardPage> {
         'like': 0,
         'imagePath': userImage,
         'createAt': Timestamp.now(),
-        'returnName': replyName
+        'returnName': replyName,
+        'postImage': '',
       });
 
       Navigator.push(

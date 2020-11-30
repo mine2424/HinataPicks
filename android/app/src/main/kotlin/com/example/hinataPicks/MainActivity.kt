@@ -1,5 +1,4 @@
-package com.example.hinataPicks
-
+package app.mine.hinataPicks
 import io.flutter.embedding.android.FlutterActivity
 
 import android.os.Build

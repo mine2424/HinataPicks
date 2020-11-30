@@ -1,4 +1,4 @@
-package com.example.hinataPicks
+package app.mine.hinataPicks
 import io.flutter.app.FlutterApplication
 import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.common.PluginRegistry.PluginRegistrantCallback
