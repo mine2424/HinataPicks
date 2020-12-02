@@ -34,11 +34,11 @@ class _HomeSectionState extends State<HomeSection> {
 
   Future anonymouslyLogin() async {
     await firebaseAuth.signInAnonymously();
-    final doc = FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('customerInfo')
         .doc(firebaseAuth.currentUser.uid)
-        .get();
-    await doc.then((doc) async {
+        .get()
+        .then((doc) async {
       if (doc.exists) {
         print("cheked document!");
         final reviewCount = doc.data()['reviewCount'];

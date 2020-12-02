@@ -114,7 +114,7 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
     }
   }
 
-  addComment(collection, customerModel) async {
+  Future<void> addComment(collection, customerModel) async {
     if (_formKey.currentState.validate()) {
       print('first func');
       String userName, userImage = '';
@@ -122,9 +122,6 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
       _formKey.currentState.save();
       // 各boardのcollectionを取得
       final sendComment = FirebaseFirestore.instance.collection(collection);
-      // boradのコメントの個数を取得
-      final commentLength =
-          await FirebaseFirestore.instance.collection(collection).get();
       // 各Userのdocを取得
       final sendUserInfoDoc = await FirebaseFirestore.instance
           .collection('customerInfo')
@@ -148,7 +145,7 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
       }
       print('previous post image');
 
-      await sendComment.doc((commentLength.docs.length + 1).toString()).set({
+      await sendComment.add({
         'userUid': _firebaseAuth,
         'name': userName,
         'context': content,
@@ -159,6 +156,7 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
       });
 
       //投稿する画像があったらfirebase storegeに送信する
+      //TODO docの部分をどうするか考える（手前に持ってきてグローバル変数としてstrを持たせるのが得策とかんがえる）
       if (_image != null) {
         var task = await firebase_storage.FirebaseStorage.instance
             .ref('chatImages/' + _firebaseAuth + '.jpg')
@@ -166,7 +164,7 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
         await task.ref.getDownloadURL().then((downloadURL) => FirebaseFirestore
             .instance
             .collection(collection)
-            .doc((commentLength.docs.length + 1).toString())
+            .doc()
             .update({'postImage': downloadURL}));
       } else {
         postImage = '';
