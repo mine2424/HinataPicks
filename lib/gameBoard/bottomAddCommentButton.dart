@@ -1,6 +1,7 @@
 import '../importer.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
+// ignore: must_be_immutable
 class BottomAddCommentButton extends StatefulWidget {
   var chatLength;
   String collection;
@@ -49,6 +50,7 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
   }
 }
 
+// ignore: must_be_immutable
 class AlertDialogSection extends StatefulWidget {
   var customerModel, collection;
 

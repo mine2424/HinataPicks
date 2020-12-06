@@ -1,6 +1,5 @@
-import 'package:hinataPicks/gameBoard/board_detail_image.dart';
-import 'package:hinataPicks/gameBoard/board_user_info.dart';
 import '../importer.dart';
+import 'package:hinataPicks/gameBoard/board_user_info.dart';
 
 // ignore: must_be_immutable
 class BoardPage extends StatefulWidget {
