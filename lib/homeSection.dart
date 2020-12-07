@@ -171,7 +171,7 @@ class _HomeSectionState extends State<HomeSection> {
           body: Stack(
             children: [
               bottomIcons == BottomIcons.Blog ? BlogPage() : Container(),
-              bottomIcons == BottomIcons.Video ? BoardSelect() : Container(),
+              bottomIcons == BottomIcons.Video ? BoardPage() : Container(),
               bottomIcons == BottomIcons.Ranking
                   ? StrategyHomePage()
                   : Container(),

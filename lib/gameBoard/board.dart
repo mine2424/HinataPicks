@@ -3,8 +3,6 @@ import 'package:hinataPicks/gameBoard/board_user_info.dart';
 
 // ignore: must_be_immutable
 class BoardPage extends StatefulWidget {
-  var collection, addComment;
-  BoardPage({Key key, @required this.collection}) : super(key: key);
   @override
   BoardPageState createState() => BoardPageState();
 }
@@ -96,10 +94,10 @@ class BoardPageState extends State<BoardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: BottomAddCommentButton(
-          collection: widget.collection, chatLength: chatLength, sendUser: ''),
+          collection: 'friendChats', chatLength: chatLength, sendUser: ''),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection(widget.collection)
+            .collection('friendChats')
             .orderBy('createAt', descending: true)
             .limit(160)
             .snapshots(),
@@ -120,11 +118,8 @@ class BoardPageState extends State<BoardPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          (widget.collection == 'friendChats')
-                              ? Image.asset('assets/images/chat-hinakoi.png',
-                                  scale: 1.4)
-                              : Image.asset('assets/images/chat-normal.png',
-                                  scale: 1.4),
+                          Image.asset('assets/images/chat-hinakoi.png',
+                              scale: 1.4),
                           SizedBox(
                               height: MediaQuery.of(context).size.height * 0.2)
                         ],
@@ -150,7 +145,7 @@ class BoardPageState extends State<BoardPage> {
 
   Widget commentBox(chatsItem, createdTime, isAdmin) {
     final likeDoc = FirebaseFirestore.instance
-        .collection(widget.collection)
+        .collection('friendChats')
         .doc(chatsItem.id.toString());
 
     final userDoc = FirebaseFirestore.instance
@@ -425,7 +420,7 @@ class BoardPageState extends State<BoardPage> {
                           FlatButton(
                             onPressed: () {
                               replyComment(
-                                  widget.collection, chatsItem.data()['name']);
+                                  'friendChats', chatsItem.data()['name']);
                             },
                             child: const Text('返信'),
                           ),
@@ -478,7 +473,7 @@ class BoardPageState extends State<BoardPage> {
 
   Future removeComment(String nowComment) async {
     await FirebaseFirestore.instance
-        .collection(widget.collection)
+        .collection('friendChats')
         .doc(nowComment)
         .delete();
     return Navigator.pop(context);
