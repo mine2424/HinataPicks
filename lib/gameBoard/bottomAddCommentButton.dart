@@ -155,6 +155,8 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
         'imagePath': userImage,
         'createAt': Timestamp.now(),
         'postImage': postImage,
+        'returnName': '',
+        'returnUserUid': ''
       });
 
       //投稿する画像があったらfirebase storegeに送信する

@@ -37,7 +37,7 @@ class BoardPageState extends State<BoardPage> {
       launch('https://hinatapicks.web.app/');
     };
 
-  replyComment(collection, replyName) async {
+  replyComment(collection, replyInfo) async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       String userName, userImage = '';
@@ -76,7 +76,8 @@ class BoardPageState extends State<BoardPage> {
         'like': 0,
         'imagePath': userImage,
         'createAt': Timestamp.now(),
-        'returnName': replyName,
+        'returnName': replyInfo['name'],
+        'returnUserUid': replyInfo['userUid'],
         'postImage': '',
       });
 
@@ -179,7 +180,7 @@ class BoardPageState extends State<BoardPage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 15),
+            const SizedBox(height: 24),
             Container(
                 margin: const EdgeInsets.only(top: 5, bottom: 5, left: 3),
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
@@ -419,8 +420,7 @@ class BoardPageState extends State<BoardPage> {
                               child: const Text('キャンセル')),
                           FlatButton(
                             onPressed: () {
-                              replyComment(
-                                  'friendChats', chatsItem.data()['name']);
+                              replyComment('friendChats', chatsItem.data());
                             },
                             child: const Text('返信'),
                           ),
