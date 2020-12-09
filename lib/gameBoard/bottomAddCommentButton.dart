@@ -155,7 +155,7 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
         'imagePath': userImage,
         'createAt': Timestamp.now(),
         'postImage': postImage,
-        'returnName': '',
+        'returnName': null,
         'returnUserUid': ''
       });
 

@@ -1,3 +1,5 @@
+import 'package:hinataPicks/gameBoard/board_room.dart';
+
 import '../importer.dart';
 import 'package:hinataPicks/gameBoard/board_user_info.dart';
 
@@ -166,8 +168,6 @@ class BoardPageState extends State<BoardPage> {
                 width: MediaQuery.of(context).size.width * 0.16,
                 height: MediaQuery.of(context).size.width * 0.16,
                 decoration: BoxDecoration(
-                    // border: Border.all(
-                    //     color: Colors.grey, width: 5),
                     shape: BoxShape.circle,
                     color: Colors.white,
                     image: DecorationImage(
@@ -313,16 +313,20 @@ class BoardPageState extends State<BoardPage> {
                       final fetchLike = await likeDoc.get();
                       final fetchUserlike = await userDoc.get();
                       if (isLike) {
-                        likeDoc.update({'like': fetchLike.data()['like'] + 1});
-                        likeDoc.update({'isLike': false});
+                        likeDoc.update({
+                          'like': fetchLike.data()['like'] + 1,
+                          'isLike': false
+                        });
                         userDoc
                             .update({'like': fetchUserlike.data()['like'] + 1});
                         setState(() {
                           isLike = false;
                         });
                       } else {
-                        likeDoc.update({'like': fetchLike.data()['like'] - 1});
-                        likeDoc.update({'isLike': true});
+                        likeDoc.update({
+                          'like': fetchLike.data()['like'] - 1,
+                          'isLike': true
+                        });
                         userDoc
                             .update({'like': fetchUserlike.data()['like'] - 1});
                         setState(() {
@@ -357,6 +361,10 @@ class BoardPageState extends State<BoardPage> {
                   color: Colors.grey,
                   onPressed: () {
                     var myname = chatsItem.data()['name'];
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (context) => BoardRoomPage()));
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
