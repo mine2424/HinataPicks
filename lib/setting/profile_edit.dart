@@ -103,8 +103,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               image: _image == null
                   ? (widget.costomer.imagePath != '')
                       ? NetworkImage(widget.costomer.imagePath)
-                      : const AssetImage(
-                          'assets/images/HinataPicks-logo-new.png')
+                      : const AssetImage('assets/images/hinakoi-chat.png')
                   : FileImage(_image)),
         ));
   }

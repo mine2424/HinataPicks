@@ -82,7 +82,7 @@ class _ProfilePageState extends State<ProfilePage> {
         image: DecorationImage(
             fit: BoxFit.cover,
             image: (consumerModel.imagePath == '')
-                ? const AssetImage('assets/images/HinataPicks-logo-new.png')
+                ? const AssetImage('assets/images/hinakoi-chat.png')
                 : NetworkImage(consumerModel.imagePath)),
       ),
     );

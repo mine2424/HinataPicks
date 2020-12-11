@@ -80,25 +80,28 @@ class _HomeSectionState extends State<HomeSection> {
         .doc(firebaseAuth.currentUser.uid)
         .get();
     int reviewCount = fetchReviewCount.data()['reviewCount'];
-    if (reviewCount % 10 == 0) {
+    if (reviewCount % 10 == 0 || reviewCount == 1) {
       return showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-                title: const Text('お願い'),
-                content: const Text('HinataPicksの関するレビュー・ご要望等を書いていただけたら幸いです！'),
-                actions: [
-                  FlatButton(
-                      onPressed: () {
-                        LaunchReview.launch(iOSAppId: "1536579253");
-                      },
-                      child: const Text('レビューを書く')),
-                  FlatButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('書かない'))
-                ],
-              ));
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('お願い'),
+          content: const Text('ひなこいチャットの関するレビュー・ご要望等を書いていただけたら幸いです！'),
+          actions: [
+            FlatButton(
+                onPressed: () {
+                  LaunchReview.launch(
+                      iOSAppId: "1536579253",
+                      androidAppId: 'app.mine.hinataPicks');
+                },
+                child: const Text('レビューを書く')),
+            FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('書かない'))
+          ],
+        ),
+      );
     }
   }
 
@@ -107,7 +110,7 @@ class _HomeSectionState extends State<HomeSection> {
     // TabController _tabController;
     return Scaffold(
         appBar: AppBar(
-          title: Text("HinataPicks", style: TextStyle(color: Colors.black)),
+          title: Text("ひなこいチャット", style: TextStyle(color: Colors.black)),
           iconTheme: const IconThemeData(color: Colors.black),
           backgroundColor: Colors.white,
           elevation: 0,

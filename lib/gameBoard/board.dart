@@ -71,7 +71,7 @@ class BoardPageState extends State<BoardPage> {
         userName = await sendUserInfoDoc.data()['insta'];
       }
 
-      await sendComment.doc((commentLength.docs.length + 1).toString()).set({
+      await sendComment.add({
         'userUid': _firebaseAuth,
         'name': userName,
         'context': content,
@@ -174,8 +174,7 @@ class BoardPageState extends State<BoardPage> {
                         fit: BoxFit.cover,
                         image: (chatsItem.data()['imagePath'] == null ||
                                 chatsItem.data()['imagePath'] == '')
-                            ? AssetImage(
-                                'assets/images/HinataPicks-logo-new.png')
+                            ? AssetImage('assets/images/hinakoi-chat.png')
                             : NetworkImage(chatsItem.data()['imagePath']))))),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
