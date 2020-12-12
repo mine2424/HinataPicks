@@ -34,7 +34,7 @@ class _HomeSectionState extends State<HomeSection> {
 
   Future anonymouslyLogin() async {
     await firebaseAuth.signInAnonymously();
-    await FirebaseFirestore.instance
+    FirebaseFirestore.instance
         .collection('customerInfo')
         .doc(firebaseAuth.currentUser.uid)
         .get()
@@ -80,7 +80,7 @@ class _HomeSectionState extends State<HomeSection> {
         .doc(firebaseAuth.currentUser.uid)
         .get();
     int reviewCount = fetchReviewCount.data()['reviewCount'];
-    if (reviewCount % 10 == 0 || reviewCount == 1) {
+    if (reviewCount % 10 == 0 || reviewCount == 2) {
       return showDialog(
         context: context,
         builder: (context) => AlertDialog(
