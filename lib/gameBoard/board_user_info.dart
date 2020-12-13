@@ -1,4 +1,5 @@
 import '../importer.dart';
+
 // ignore: must_be_immutable
 class BoardUserInfoPage extends StatefulWidget {
   var userUid;
@@ -89,7 +90,7 @@ class _BoardUserInfoPageState extends State<BoardUserInfoPage> {
         image: DecorationImage(
             fit: BoxFit.cover,
             image: (consumerModel.imagePath == '')
-                ? const AssetImage('assets/images/HinataPicks-logo-new.png')
+                ? const AssetImage('assets/images/hinakoi-chat.png')
                 : NetworkImage(consumerModel.imagePath)),
       ),
     );

@@ -159,7 +159,6 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
         'returnUserUid': ''
       });
 
-      //投稿する画像があったらfirebase storegeに送信する
       //TODO docの部分をどうするか考える（手前に持ってきてグローバル変数としてstrを持たせるのが得策とかんがえる）
       if (_image != null) {
         var task = await firebase_storage.FirebaseStorage.instance

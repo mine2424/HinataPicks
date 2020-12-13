@@ -15,8 +15,14 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
+    anonymouslyLogin();
     initNotification();
     super.initState();
+  }
+
+  Future<void> anonymouslyLogin() async {
+    final firebaseAuth = FirebaseAuth.instance;
+    await firebaseAuth.signInAnonymously();
   }
 
   @override

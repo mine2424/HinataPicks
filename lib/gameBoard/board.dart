@@ -1,5 +1,3 @@
-import 'package:hinataPicks/gameBoard/board_room.dart';
-
 import '../importer.dart';
 import 'package:hinataPicks/gameBoard/board_user_info.dart';
 
@@ -46,9 +44,6 @@ class BoardPageState extends State<BoardPage> {
       final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
       // 各boardのcollectionを取得
       final sendComment = FirebaseFirestore.instance.collection(collection);
-      // boradのコメントの個数を取得
-      final commentLength =
-          await FirebaseFirestore.instance.collection(collection).get();
       // 各Userで画像を取得
       final sendUserInfoDoc = await FirebaseFirestore.instance
           .collection('customerInfo')

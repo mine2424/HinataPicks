@@ -27,13 +27,12 @@ class _HomeSectionState extends State<HomeSection> {
 
   @override
   initState() {
-    anonymouslyLogin();
+    initializeFirestore();
     reviewDialog();
     super.initState();
   }
 
-  Future anonymouslyLogin() async {
-    await firebaseAuth.signInAnonymously();
+  Future initializeFirestore() async {
     FirebaseFirestore.instance
         .collection('customerInfo')
         .doc(firebaseAuth.currentUser.uid)
