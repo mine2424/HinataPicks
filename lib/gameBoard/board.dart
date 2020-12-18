@@ -126,6 +126,7 @@ class BoardPageState extends State<BoardPage> {
                   : ListView.builder(
                       itemCount: snapshot.data.docs.length,
                       physics: const AlwaysScrollableScrollPhysics(),
+                      shrinkWrap: true,
                       itemBuilder: (BuildContext context, int index) {
                         final chatsItem = snapshot.data.docs[index];
                         chatLength = snapshot.data.docs.length;

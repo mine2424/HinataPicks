@@ -32,7 +32,7 @@ class _BlogWebViewState extends State<BlogWebView> {
     return Scaffold(
       key: GlobalKey(),
       appBar: AppBar(
-        title: const Text("HinataPicks", style: TextStyle(color: Colors.black)),
+        title: const Text('ひなこいチャット', style: TextStyle(color: Colors.black)),
         iconTheme: const IconThemeData(color: Colors.black),
         backgroundColor: Colors.white,
         elevation: 0,

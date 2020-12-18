@@ -1,4 +1,3 @@
-import 'package:hinataPicks/notification.dart';
 import 'importer.dart';
 
 void main() async {
@@ -13,18 +12,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    anonymouslyLogin();
-    initNotification();
-    super.initState();
-  }
-
-  Future<void> anonymouslyLogin() async {
-    final firebaseAuth = FirebaseAuth.instance;
-    await firebaseAuth.signInAnonymously();
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

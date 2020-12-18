@@ -3,8 +3,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 FirebaseMessaging firebaseMessaging;
 
-BuildContext context;
-
 Future<void> initNotification() async {
   firebaseMessaging = FirebaseMessaging()
     ..requestNotificationPermissions()

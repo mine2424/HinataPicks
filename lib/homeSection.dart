@@ -1,3 +1,5 @@
+import 'package:hinataPicks/notification.dart';
+
 import 'importer.dart';
 
 class HomeSection extends StatefulWidget {
@@ -9,7 +11,7 @@ enum BottomIcons { Blog, Video, Ranking, Other }
 
 class _HomeSectionState extends State<HomeSection> {
   BottomIcons bottomIcons = BottomIcons.Video;
-  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  bool isLoading = true;
 
   //外部URLへページ遷移(webviewではない)
   Future<void> _launchURL(String link) async {
@@ -27,38 +29,53 @@ class _HomeSectionState extends State<HomeSection> {
 
   @override
   initState() {
-    initializeFirestore();
-    reviewDialog();
     super.initState();
+    anonymouslyLogin();
+    initializeFirestore();
+    initNotification();
+    reviewDialog();
   }
 
-  Future initializeFirestore() async {
-    FirebaseFirestore.instance
+  @override
+  dispose() {
+    super.dispose();
+  }
+
+  Future<void> anonymouslyLogin() async {
+    await FirebaseAuth.instance.signInAnonymously();
+    setState(() {
+      isLoading = false;
+    });
+    // final firebaseAuth = FirebaseAuth.instance;
+  }
+
+  Future<void> initializeFirestore() async {
+    final _userUid = FirebaseAuth.instance.currentUser.uid;
+    await FirebaseFirestore.instance
         .collection('customerInfo')
-        .doc(firebaseAuth.currentUser.uid)
+        .doc(_userUid)
         .get()
         .then((doc) async {
       if (doc.exists) {
         print("cheked document!");
-        final reviewCount = doc.data()['reviewCount'];
-        if (reviewCount == null) {
+        if (doc.data()['reviewCount'] == null) {
           await FirebaseFirestore.instance
               .collection('customerInfo')
-              .doc(firebaseAuth.currentUser.uid)
+              .doc(_userUid)
               .update({'reviewCount': 1});
         } else {
           await FirebaseFirestore.instance
               .collection('customerInfo')
-              .doc(firebaseAuth.currentUser.uid)
-              .update({'reviewCount': reviewCount + 1});
+              .doc(_userUid)
+              .update({'reviewCount': doc.data()['reviewCount'] + 1});
         }
       } else {
         print("No such document!");
         await FirebaseFirestore.instance
             .collection('customerInfo')
-            .doc(firebaseAuth.currentUser.uid)
+            .doc(_userUid)
             .set({
-          'uid': firebaseAuth.currentUser.uid,
+          'uid': _userUid,
           'like': 0,
           'message': '',
           'gameId': '',
@@ -76,10 +93,11 @@ class _HomeSectionState extends State<HomeSection> {
   Future reviewDialog() async {
     var fetchReviewCount = await FirebaseFirestore.instance
         .collection('customerInfo')
-        .doc(firebaseAuth.currentUser.uid)
+        .doc(FirebaseAuth.instance.currentUser.uid)
         .get();
-    int reviewCount = fetchReviewCount.data()['reviewCount'];
-    if (reviewCount % 10 == 0 || reviewCount == 2) {
+
+    if (fetchReviewCount.data()['reviewCount'] % 10 == 0 ||
+        fetchReviewCount.data()['reviewCount'] == 2) {
       return showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -106,216 +124,246 @@ class _HomeSectionState extends State<HomeSection> {
 
   @override
   Widget build(BuildContext context) {
-    // TabController _tabController;
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("ひなこいチャット", style: TextStyle(color: Colors.black)),
-          iconTheme: const IconThemeData(color: Colors.black),
-          backgroundColor: Colors.white,
-          elevation: 0,
-          brightness: Brightness.light,
-          centerTitle: true,
-        ),
-        drawer: Drawer(
-          child: ListView(
-            children: [
-              const SizedBox(
-                height: 30,
-              ),
-              Center(
-                  child: Column(
+    return (isLoading)
+        ? Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('アプリについて'),
+                  const Text('Now Loading...',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w300))
                 ],
-              )),
-              Divider(),
-              ListTile(
-                title: const Text(
-                  'お問い合わせ',
-                  style: TextStyle(fontSize: 20),
-                ),
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => SettingPage()));
-                },
               ),
-              ListTile(
-                title: const Text(
-                  '利用規約',
-                  style: TextStyle(fontSize: 20),
-                ),
-                onTap: () {
-                  _launchURL('https://hinatapicks.web.app/');
-                },
-              ),
-              ListTile(
-                title: const Text(
-                  'レビューを書く',
-                  style: TextStyle(fontSize: 20),
-                ),
-                onTap: () {
-                  LaunchReview.launch(
-                      iOSAppId: "1536579253",
-                      androidAppId: 'app.mine.hinataPicks');
-                },
-              ),
-              const ListTile(
-                title: const Text(
-                  'version 1.1.3',
-                  style: TextStyle(fontSize: 20),
-                ),
-              ),
-            ],
-          ),
-        ),
-        body: Stack(
-          children: [
-            bottomIcons == BottomIcons.Blog ? BlogPage() : Container(),
-            bottomIcons == BottomIcons.Video ? BoardPage() : Container(),
-            bottomIcons == BottomIcons.Ranking
-                ? StrategyHomePage()
-                : Container(),
-            bottomIcons == BottomIcons.Other ? ProfilePage() : Container(),
-            Align(
-                alignment: Alignment.bottomLeft,
-                child: Container(
-                  padding:
-                      const EdgeInsets.only(left: 60, right: 60, bottom: 36),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              bottomIcons = BottomIcons.Video;
-                            });
-                          },
-                          child: bottomIcons == BottomIcons.Video
-                              ? Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.indigo.shade100
-                                          .withOpacity(0.6),
-                                      borderRadius: BorderRadius.circular(30)),
-                                  padding: const EdgeInsets.only(
-                                      left: 16, right: 16, top: 8, bottom: 8),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.chat,
-                                        color: Colors.indigo,
-                                      ),
-                                      SizedBox(
-                                        width: 8,
-                                      ),
-                                      Text('掲示板',
-                                          style: TextStyle(
-                                              color: Colors.indigo,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 15))
-                                    ],
-                                  ),
-                                )
-                              : Icon(Icons.chat)),
-                      GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              bottomIcons = BottomIcons.Ranking;
-                            });
-                          },
-                          child: bottomIcons == BottomIcons.Ranking
-                              ? Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.indigo.shade100
-                                          .withOpacity(0.6),
-                                      borderRadius: BorderRadius.circular(30)),
-                                  padding: EdgeInsets.only(
-                                      left: 16, right: 16, top: 8, bottom: 8),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.new_releases,
-                                        color: Colors.indigo,
-                                      ),
-                                      SizedBox(
-                                        width: 8,
-                                      ),
-                                      Text('ひなこい',
-                                          style: TextStyle(
-                                              color: Colors.indigo,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 15))
-                                    ],
-                                  ),
-                                )
-                              : Icon(Icons.new_releases)),
-                      GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              bottomIcons = BottomIcons.Blog;
-                            });
-                          },
-                          child: bottomIcons == BottomIcons.Blog
-                              ? Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.indigo.shade100
-                                          .withOpacity(0.6),
-                                      borderRadius: BorderRadius.circular(30)),
-                                  padding: const EdgeInsets.only(
-                                      left: 16, right: 16, top: 8, bottom: 8),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.book,
-                                        color: Colors.indigo,
-                                      ),
-                                      const SizedBox(
-                                        width: 8,
-                                      ),
-                                      const Text('ブログ',
-                                          style: TextStyle(
-                                              color: Colors.indigo,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 15))
-                                    ],
-                                  ),
-                                )
-                              : Icon(Icons.book)),
-                      GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              bottomIcons = BottomIcons.Other;
-                            });
-                          },
-                          child: bottomIcons == BottomIcons.Other
-                              ? Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.indigo.shade100
-                                          .withOpacity(0.6),
-                                      borderRadius: BorderRadius.circular(30)),
-                                  padding: EdgeInsets.only(
-                                      left: 16, right: 16, top: 8, bottom: 8),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.people,
-                                        color: Colors.indigo,
-                                      ),
-                                      SizedBox(
-                                        width: 8,
-                                      ),
-                                      Text('設定',
-                                          style: TextStyle(
-                                              color: Colors.indigo,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 15))
-                                    ],
-                                  ),
-                                )
-                              : Icon(Icons.people)),
-                    ],
+            ),
+          )
+        : Scaffold(
+            appBar: AppBar(
+              title: Text("ひなこいチャット", style: TextStyle(color: Colors.black)),
+              iconTheme: const IconThemeData(color: Colors.black),
+              backgroundColor: Colors.white,
+              elevation: 0,
+              brightness: Brightness.light,
+              centerTitle: true,
+            ),
+            drawer: Drawer(
+              child: ListView(
+                children: [
+                  const SizedBox(
+                    height: 30,
                   ),
-                ))
-          ],
-        ));
+                  Center(
+                      child: Column(
+                    children: [
+                      const Text('アプリについて'),
+                    ],
+                  )),
+                  Divider(),
+                  ListTile(
+                    title: const Text(
+                      'お問い合わせ',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SettingPage()));
+                    },
+                  ),
+                  ListTile(
+                    title: const Text(
+                      '利用規約',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    onTap: () {
+                      _launchURL('https://hinatapicks.web.app/');
+                    },
+                  ),
+                  ListTile(
+                    title: const Text(
+                      'レビューを書く',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    onTap: () {
+                      LaunchReview.launch(
+                          iOSAppId: "1536579253",
+                          androidAppId: 'app.mine.hinataPicks');
+                    },
+                  ),
+                  const ListTile(
+                    title: const Text(
+                      'version 1.1.3',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            body: Stack(
+              children: [
+                bottomIcons == BottomIcons.Blog ? BlogPage() : Container(),
+                bottomIcons == BottomIcons.Video ? BoardPage() : Container(),
+                bottomIcons == BottomIcons.Ranking
+                    ? StrategyHomePage()
+                    : Container(),
+                bottomIcons == BottomIcons.Other ? ProfilePage() : Container(),
+                Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Container(
+                      padding: const EdgeInsets.only(
+                          left: 60, right: 60, bottom: 36),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  bottomIcons = BottomIcons.Video;
+                                });
+                              },
+                              child: bottomIcons == BottomIcons.Video
+                                  ? Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.indigo.shade100
+                                              .withOpacity(0.6),
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                      padding: const EdgeInsets.only(
+                                          left: 16,
+                                          right: 16,
+                                          top: 8,
+                                          bottom: 8),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.chat,
+                                            color: Colors.indigo,
+                                          ),
+                                          SizedBox(
+                                            width: 8,
+                                          ),
+                                          Text('掲示板',
+                                              style: TextStyle(
+                                                  color: Colors.indigo,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15))
+                                        ],
+                                      ),
+                                    )
+                                  : Icon(Icons.chat)),
+                          GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  bottomIcons = BottomIcons.Ranking;
+                                });
+                              },
+                              child: bottomIcons == BottomIcons.Ranking
+                                  ? Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.indigo.shade100
+                                              .withOpacity(0.6),
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                      padding: EdgeInsets.only(
+                                          left: 16,
+                                          right: 16,
+                                          top: 8,
+                                          bottom: 8),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.new_releases,
+                                            color: Colors.indigo,
+                                          ),
+                                          SizedBox(
+                                            width: 8,
+                                          ),
+                                          Text('ひなこい',
+                                              style: TextStyle(
+                                                  color: Colors.indigo,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15))
+                                        ],
+                                      ),
+                                    )
+                                  : Icon(Icons.new_releases)),
+                          GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  bottomIcons = BottomIcons.Blog;
+                                });
+                              },
+                              child: bottomIcons == BottomIcons.Blog
+                                  ? Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.indigo.shade100
+                                              .withOpacity(0.6),
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                      padding: const EdgeInsets.only(
+                                          left: 16,
+                                          right: 16,
+                                          top: 8,
+                                          bottom: 8),
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.book,
+                                            color: Colors.indigo,
+                                          ),
+                                          const SizedBox(
+                                            width: 8,
+                                          ),
+                                          const Text('ブログ',
+                                              style: TextStyle(
+                                                  color: Colors.indigo,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15))
+                                        ],
+                                      ),
+                                    )
+                                  : Icon(Icons.book)),
+                          GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  bottomIcons = BottomIcons.Other;
+                                });
+                              },
+                              child: bottomIcons == BottomIcons.Other
+                                  ? Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.indigo.shade100
+                                              .withOpacity(0.6),
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                      padding: EdgeInsets.only(
+                                          left: 16,
+                                          right: 16,
+                                          top: 8,
+                                          bottom: 8),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.people,
+                                            color: Colors.indigo,
+                                          ),
+                                          SizedBox(
+                                            width: 8,
+                                          ),
+                                          Text('設定',
+                                              style: TextStyle(
+                                                  color: Colors.indigo,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15))
+                                        ],
+                                      ),
+                                    )
+                                  : Icon(Icons.people)),
+                        ],
+                      ),
+                    ))
+              ],
+            ));
   }
 }
