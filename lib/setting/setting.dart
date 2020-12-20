@@ -97,7 +97,8 @@ class _SettingPageState extends State<SettingPage> {
           FirebaseFirestore.instance.collection('usersContactForm').add({
             'createAt': Timestamp.now(),
             'email': _callMail,
-            'text': _callContext
+            'text': _callContext,
+            'uid': FirebaseAuth.instance.currentUser.uid
           });
           return Navigator.push(
               context, MaterialPageRoute(builder: (context) => FormFinish()));
