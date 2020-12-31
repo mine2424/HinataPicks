@@ -402,7 +402,7 @@ PODS:
   - path_provider (0.0.1):
     - Flutter
   - PromisesObjC (1.2.11)
-  - Protobuf (3.13.0)
+  - Protobuf (3.14.0)
   - share (0.0.1):
     - Flutter
   - shared_preferences (0.0.1):
@@ -547,7 +547,7 @@ SPEC CHECKSUMS:
   nanopb: 59317e09cf1f1a0af72f12af412d54edf52603fc
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   PromisesObjC: 8c196f5a328c2cba3e74624585467a557dcb482f
-  Protobuf: 3dac39b34a08151c6d949560efe3f86134a3f748
+  Protobuf: 0cde852566359049847168e51bd1c690e0f70056
   share: 0b2c3e82132f5888bccca3351c504d0003b3b410
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   sqflite: 4001a31ff81d210346b500c55b17f4d6c7589dd0

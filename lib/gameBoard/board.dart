@@ -1,5 +1,6 @@
 import '../importer.dart';
 import 'package:hinataPicks/gameBoard/board_user_info.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 // ignore: must_be_immutable
 class BoardPage extends StatefulWidget {
@@ -7,17 +8,18 @@ class BoardPage extends StatefulWidget {
   BoardPageState createState() => BoardPageState();
 }
 
+List chatsList = [];
+String content, postImage;
+bool isLike = true;
+File _image2;
+final picker = ImagePicker();
+var _messageCautionsList = ['ブロック', '報告', '削除'];
+//TODO シングルトン化してコードの省略
+final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
+var chatLength, customerImagePath;
+final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
 class BoardPageState extends State<BoardPage> {
-  List chatsList = [];
-  String content;
-  bool isLike = true;
-  var _messageCautionsList = ['ブロック', '報告', '削除'];
-  //TODO シングルトン化してコードの省略
-  final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
-  var chatLength, customerImagePath;
-
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   //外部URLへページ遷移(webviewではない)
   Future<void> _launchURL(String link) async {
     if (await canLaunch(link)) {
@@ -29,57 +31,6 @@ class BoardPageState extends State<BoardPage> {
       );
     } else {
       throw 'サイトを開くことが出来ません。。。 $link';
-    }
-  }
-
-  TapGestureRecognizer _recognizer = TapGestureRecognizer()
-    ..onTap = () {
-      launch('https://hinatapicks.web.app/');
-    };
-
-  replyComment(collection, replyInfo) async {
-    if (_formKey.currentState.validate()) {
-      _formKey.currentState.save();
-      String userName, userImage = '';
-      final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
-      // 各boardのcollectionを取得
-      final sendComment = FirebaseFirestore.instance.collection(collection);
-      // 各Userで画像を取得
-      final sendUserInfoDoc = await FirebaseFirestore.instance
-          .collection('customerInfo')
-          .doc(_firebaseAuth)
-          .get();
-
-      if (sendUserInfoDoc.data()['imagePath'] == null) {
-        await FirebaseFirestore.instance
-            .collection('customerInfo')
-            .doc(_firebaseAuth)
-            .update({'imagePath': ''});
-      } else {
-        userImage = await sendUserInfoDoc.data()['imagePath'];
-      }
-
-      if (sendUserInfoDoc.data()['insta'] == '') {
-        userName =
-            '匿名おひさまさん(${sendUserInfoDoc.data()['uid'].toString().substring(0, 7)})';
-      } else {
-        userName = await sendUserInfoDoc.data()['insta'];
-      }
-
-      await sendComment.add({
-        'userUid': _firebaseAuth,
-        'name': userName,
-        'context': content,
-        'like': 0,
-        'imagePath': userImage,
-        'createAt': Timestamp.now(),
-        'returnName': replyInfo['name'],
-        'returnUserUid': replyInfo['userUid'],
-        'postImage': '',
-      });
-
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => HomeSection()));
     }
   }
 
@@ -132,9 +83,10 @@ class BoardPageState extends State<BoardPage> {
                         chatLength = snapshot.data.docs.length;
                         DateTime createdTime =
                             chatsItem.data()['createAt'].toDate();
+                        // print(chatsItem.data()['name']);
                         return (chatsItem.data()['name'] == '運営')
-                            ? commentBox(chatsItem, createdTime, 'admin')
-                            : commentBox(chatsItem, createdTime, '');
+                            ? commentBox(chatsItem, createdTime, 'admin', index)
+                            : commentBox(chatsItem, createdTime, '', index);
                       },
                     );
         },
@@ -142,7 +94,7 @@ class BoardPageState extends State<BoardPage> {
     );
   }
 
-  Widget commentBox(chatsItem, createdTime, isAdmin) {
+  Widget commentBox(chatsItem, createdTime, isAdmin, int heroCount) {
     final likeDoc = FirebaseFirestore.instance
         .collection('friendChats')
         .doc(chatsItem.id.toString());
@@ -153,25 +105,33 @@ class BoardPageState extends State<BoardPage> {
     return Row(
       children: [
         FlatButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BoardUserInfoPage(
-                          userUid: chatsItem.data()['userUid'])));
-            },
-            child: Container(
-                width: MediaQuery.of(context).size.width * 0.16,
-                height: MediaQuery.of(context).size.width * 0.16,
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: (chatsItem.data()['imagePath'] == null ||
-                                chatsItem.data()['imagePath'] == '')
-                            ? AssetImage('assets/images/hinakoi-chat.png')
-                            : NetworkImage(chatsItem.data()['imagePath']))))),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    BoardUserInfoPage(userUid: chatsItem.data()['userUid']),
+              ),
+            );
+          },
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.16,
+            height: MediaQuery.of(context).size.width * 0.16,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+              image: DecorationImage(
+                fit: BoxFit.cover,
+                image: (chatsItem.data()['imagePath'] == null ||
+                        chatsItem.data()['imagePath'] == '')
+                    ? AssetImage('assets/images/hinakoi-chat.png')
+                    : NetworkImage(
+                        chatsItem.data()['imagePath'],
+                      ),
+              ),
+            ),
+          ),
+        ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -261,7 +221,7 @@ class BoardPageState extends State<BoardPage> {
                                           ),
                                         ),
                                     child: Hero(
-                                        tag: 'imageTag',
+                                        tag: heroCount.toString(),
                                         child: Image.network(
                                             chatsItem.data()['postImage'],
                                             filterQuality: FilterQuality.medium,
@@ -355,79 +315,12 @@ class BoardPageState extends State<BoardPage> {
                   ),
                   color: Colors.grey,
                   onPressed: () {
-                    var myname = chatsItem.data()['name'];
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (context) => BoardRoomPage()));
-                    showDialog(
+                    var myName = chatsItem.data()['name'];
+                    showDialog<void>(
                       context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('返信'),
-                        content: SingleChildScrollView(
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              children: [
-                                Text(myname + 'に返信'),
-                                TextFormField(
-                                  keyboardType: TextInputType.multiline,
-                                  maxLines: null,
-                                  validator: (input) {
-                                    for (var i = 0;
-                                        i < prohibisionWords.length;
-                                        i++) {
-                                      if (input.contains(prohibisionWords[i])) {
-                                        return '不適切な言葉が含まれています';
-                                      }
-                                      if (input.isEmpty) {
-                                        return '投稿内容を入力してください';
-                                      }
-                                    }
-                                    return null;
-                                  },
-                                  onSaved: (input) => content = input,
-                                  decoration:
-                                      const InputDecoration(labelText: '投稿内容'),
-                                ),
-                                const SizedBox(height: 15),
-                                RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: '投稿すると',
-                                        style:
-                                            TextStyle(color: Colors.grey[800]),
-                                      ),
-                                      TextSpan(
-                                        text: '利用規約',
-                                        style:
-                                            TextStyle(color: Colors.lightBlue),
-                                        recognizer: _recognizer,
-                                      ),
-                                      TextSpan(
-                                        text: 'に同意したものとみなします。',
-                                        style:
-                                            TextStyle(color: Colors.grey[800]),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                        actions: [
-                          FlatButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('キャンセル')),
-                          FlatButton(
-                            onPressed: () {
-                              replyComment('friendChats', chatsItem.data());
-                            },
-                            child: const Text('返信'),
-                          ),
-                        ],
+                      builder: (_) => ReplyDialogWidget(
+                        myName: myName,
+                        chatsItem: chatsItem,
                       ),
                     );
                   },
@@ -570,6 +463,205 @@ class BoardPageState extends State<BoardPage> {
           ],
         );
       },
+    );
+  }
+}
+
+class ReplyDialogWidget extends StatefulWidget {
+  ReplyDialogWidget({Key key, this.myName, this.chatsItem}) : super(key: key);
+  String myName;
+  var chatsItem;
+  @override
+  _ReplyDialogWidgetState createState() => _ReplyDialogWidgetState();
+}
+
+class _ReplyDialogWidgetState extends State<ReplyDialogWidget> {
+  Future<void> getImageFromGallery() async {
+    final pickedFile =
+        await picker.getImage(source: ImageSource.gallery, imageQuality: 60);
+
+    setState(() {
+      _image2 = File(pickedFile.path);
+    });
+  }
+
+  Future<void> retrieveLostData() async {
+    LostData response = await picker.getLostData();
+
+    if (response.isEmpty) {
+      return;
+    }
+    if (response.file != null) {
+      setState(() {
+        _image2 = File(response.file.toString());
+      });
+    } else {
+      var _retrieveDataError = response.exception.code;
+      print('RETRIEVE ERROR: ' + _retrieveDataError);
+    }
+  }
+
+  TapGestureRecognizer _recognizer = TapGestureRecognizer()
+    ..onTap = () {
+      launch('https://hinatapicks.web.app/');
+    };
+
+  Future<void> replyComment(collection, replyInfo) async {
+    if (_formKey.currentState.validate()) {
+      String userName, userImage = '';
+      final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
+      _formKey.currentState.save();
+      // 各boardのcollectionを取得
+      final sendComment = FirebaseFirestore.instance.collection(collection);
+      // 各Userで画像を取得
+      final sendUserInfoDoc = await FirebaseFirestore.instance
+          .collection('customerInfo')
+          .doc(_firebaseAuth)
+          .get();
+
+      if (sendUserInfoDoc.data()['imagePath'] == null) {
+        await FirebaseFirestore.instance
+            .collection('customerInfo')
+            .doc(_firebaseAuth)
+            .update({'imagePath': ''});
+      } else {
+        userImage = await sendUserInfoDoc.data()['imagePath'];
+      }
+
+      if (sendUserInfoDoc.data()['insta'] == '') {
+        userName =
+            '匿名おひさまさん(${sendUserInfoDoc.data()['uid'].toString().substring(0, 7)})';
+      } else {
+        userName = await sendUserInfoDoc.data()['insta'];
+      }
+
+      var sentComment = await sendComment.add({
+        'userUid': _firebaseAuth,
+        'name': userName,
+        'context': content,
+        'like': 0,
+        'imagePath': userImage,
+        'createAt': Timestamp.now(),
+        'returnName': replyInfo['name'],
+        'returnUserUid': replyInfo['userUid'],
+        'postImage': '',
+      });
+
+      //TODO docの部分をどうするか考える（手前に持ってきてグローバル変数としてstrを持たせるのが得策とかんがえる）
+      if (_image2 != null) {
+        print('_image2 exist');
+        var task = await firebase_storage.FirebaseStorage.instance
+            .ref('chatImages/' + _firebaseAuth + '.jpg')
+            .putFile(_image2);
+        await task.ref.getDownloadURL().then((downloadURL) => FirebaseFirestore
+            .instance
+            .collection(collection)
+            .doc(sentComment.id)
+            .update({'postImage': downloadURL}));
+      } else {
+        postImage = '';
+      }
+      print('end func');
+
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => HomeSection()));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('返信'),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              Text(widget.myName + 'に返信'),
+              TextFormField(
+                keyboardType: TextInputType.multiline,
+                maxLines: null,
+                validator: (input) {
+                  for (var i = 0; i < prohibisionWords.length; i++) {
+                    if (input.contains(prohibisionWords[i])) {
+                      return '不適切な言葉が含まれています';
+                    }
+                    if (input.isEmpty) {
+                      return '投稿内容を入力してください';
+                    }
+                  }
+                  return null;
+                },
+                onSaved: (input) => content = input,
+                decoration: const InputDecoration(labelText: '投稿内容'),
+              ),
+              const SizedBox(height: 15),
+              (_image2 != null) ? Image.file(_image2) : const SizedBox(),
+              const SizedBox(height: 15),
+              FlatButton(
+                onPressed: () async {
+                  await getImageFromGallery();
+                },
+                child: Material(
+                    elevation: 4,
+                    shadowColor: Colors.grey,
+                    color: Color(0xff7cc8e9),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        10,
+                      ),
+                    ),
+                    child: SizedBox(
+                      height: 35,
+                      child: Center(
+                        child: const Text(
+                          '画像を選択',
+                          style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                              letterSpacing: 0.8),
+                        ),
+                      ),
+                    )),
+              ),
+              const SizedBox(height: 15),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '投稿すると',
+                      style: TextStyle(color: Colors.grey[800]),
+                    ),
+                    TextSpan(
+                      text: '利用規約',
+                      style: TextStyle(color: Colors.lightBlue),
+                      recognizer: _recognizer,
+                    ),
+                    TextSpan(
+                      text: 'に同意したものとみなします。',
+                      style: TextStyle(color: Colors.grey[800]),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        FlatButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('キャンセル')),
+        FlatButton(
+          onPressed: () async {
+            if (_formKey.currentState.validate()) {
+              _formKey.currentState.save();
+              await replyComment('friendChats', widget.chatsItem.data());
+            }
+          },
+          child: const Text('返信'),
+        ),
+      ],
     );
   }
 }

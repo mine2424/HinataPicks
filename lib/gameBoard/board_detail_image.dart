@@ -24,7 +24,7 @@ class BoardDetailsImage extends StatelessWidget {
           ),
         ),
         Hero(
-          tag: 'imageTag',
+          tag: image.toString(),
           child: Center(
             child: SizedBox(
               child: Image.network(image),

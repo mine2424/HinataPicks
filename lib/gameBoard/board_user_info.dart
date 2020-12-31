@@ -1,9 +1,8 @@
 import '../importer.dart';
 
-// ignore: must_be_immutable
 class BoardUserInfoPage extends StatefulWidget {
-  var userUid;
   BoardUserInfoPage({Key key, this.userUid}) : super(key: key);
+  var userUid;
   @override
   _BoardUserInfoPageState createState() => _BoardUserInfoPageState();
 }
@@ -13,54 +12,62 @@ class _BoardUserInfoPageState extends State<BoardUserInfoPage> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<UserModel>(
-        create: (_) => UserModel()..fetchSelectedCustomerInfo(widget.userUid),
-        child: Consumer<UserModel>(builder: (context, model, child) {
+      create: (_) => UserModel()..fetchSelectedCustomerInfo(widget.userUid),
+      child: Consumer<UserModel>(
+        builder: (context, model, child) {
           consumerModel = model.customerInfo;
-          return Scaffold(
-              appBar: AppBar(
-                  title: const Text("HinataPicks",
-                      style: TextStyle(color: Colors.black)),
-                  iconTheme: const IconThemeData(color: Colors.black),
-                  backgroundColor: Colors.white,
-                  elevation: 0,
-                  brightness: Brightness.light,
-                  centerTitle: true),
-              body: (model.isLoading)
-                  ? Center(
-                      child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [const CircularProgressIndicator()],
-                    ))
-                  : Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        CustomPaint(
-                          child: Container(
-                            child: Center(
+          // print('comsumer position ${consumerModel.imagePath}');
+          return (model.isLoading)
+              ? Scaffold(
+                  body: Center(
+                    child: const CircularProgressIndicator(),
+                  ),
+                )
+              : Scaffold(
+                  appBar: AppBar(
+                      title: const Text(
+                        "HinataPicks",
+                        style: TextStyle(color: Colors.black),
+                      ),
+                      iconTheme: const IconThemeData(color: Colors.black),
+                      backgroundColor: Colors.white,
+                      elevation: 0,
+                      brightness: Brightness.light,
+                      centerTitle: true),
+                  body: (model.isLoading)
+                      ? Center(
+                          child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [const CircularProgressIndicator()],
+                        ))
+                      : Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            CustomPaint(
+                              child: Container(
+                                child: const SizedBox(),
+                                width: MediaQuery.of(context).size.width,
+                                height: MediaQuery.of(context).size.height,
+                              ),
+                              painter: HeaderCurvedContainer(),
+                            ),
+                            SingleChildScrollView(
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [],
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  _profileText(),
+                                  _circleAvatar(),
+                                  _textListCalling(),
+                                  const SizedBox(height: 120)
+                                ],
                               ),
                             ),
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height,
-                          ),
-                          painter: HeaderCurvedContainer(),
+                          ],
                         ),
-                        SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              _profileText(),
-                              _circleAvatar(),
-                              _textListCalling(),
-                              const SizedBox(height: 120)
-                            ],
-                          ),
-                        ),
-                      ],
-                    ));
-        }));
+                );
+        },
+      ),
+    );
   }
 
   Widget _profileText() {
@@ -88,10 +95,12 @@ class _BoardUserInfoPageState extends State<BoardUserInfoPage> {
         shape: BoxShape.circle,
         color: Colors.white,
         image: DecorationImage(
-            fit: BoxFit.cover,
-            image: (consumerModel.imagePath == '')
-                ? const AssetImage('assets/images/hinakoi-chat.png')
-                : NetworkImage(consumerModel.imagePath)),
+          fit: BoxFit.cover,
+          image:
+              (consumerModel.imagePath == '' || consumerModel.imagePath == null)
+                  ? const AssetImage('assets/images/hinakoi-chat.png')
+                  : NetworkImage(consumerModel.imagePath),
+        ),
       ),
     );
   }

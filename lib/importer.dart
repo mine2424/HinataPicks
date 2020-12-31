@@ -5,6 +5,7 @@ export 'package:flutter/services.dart';
 export 'package:flutter/rendering.dart';
 
 export 'dart:io';
+export 'package:http/http.dart';
 export 'package:share/share.dart';
 export 'package:provider/provider.dart';
 export 'package:getwidget/getwidget.dart';

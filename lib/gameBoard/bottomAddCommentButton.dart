@@ -30,9 +30,7 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
               : Container(
                   margin: const EdgeInsets.only(bottom: 55),
                   child: FloatingActionButton(
-                    heroTag: (widget.collection == 'friendChats')
-                        ? 'hero1'
-                        : 'hero2',
+                    heroTag: 'button1',
                     onPressed: () async {
                       return await showDialog(
                           context: context,
@@ -95,9 +93,6 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
     setState(() {
       _image = File(pickedFile.path);
     });
-    // if (_image == null) {
-    //   await retrieveLostData();
-    // }
   }
 
   Future<void> retrieveLostData() async {
@@ -118,18 +113,20 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
 
   Future<void> addComment(collection, customerModel) async {
     if (_formKey.currentState.validate()) {
-      print('first func');
+      print('start func');
       String userName, userImage = '';
       final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
       _formKey.currentState.save();
       // 各boardのcollectionを取得
       final sendComment = FirebaseFirestore.instance.collection(collection);
+      print(sendComment.id);
       // 各Userのdocを取得
       final sendUserInfoDoc = await FirebaseFirestore.instance
           .collection('customerInfo')
           .doc(_firebaseAuth)
           .get();
       //投稿するユーザーの画像の判別
+      print(sendUserInfoDoc.data()['imagePath']);
       if (sendUserInfoDoc.data()['imagePath'] == null) {
         await FirebaseFirestore.instance
             .collection('customerInfo')
@@ -147,7 +144,7 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
       }
       print('previous post image');
 
-      await sendComment.add({
+      var sentComment = await sendComment.add({
         'userUid': _firebaseAuth,
         'name': userName,
         'context': content,
@@ -159,15 +156,20 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
         'returnUserUid': ''
       });
 
+      print('done add doc');
+
       //TODO docの部分をどうするか考える（手前に持ってきてグローバル変数としてstrを持たせるのが得策とかんがえる）
+      print('previous send _image = $_image');
       if (_image != null) {
+        print('start send image');
         var task = await firebase_storage.FirebaseStorage.instance
             .ref('chatImages/' + _firebaseAuth + '.jpg')
             .putFile(_image);
+        print(task.storage);
         await task.ref.getDownloadURL().then((downloadURL) => FirebaseFirestore
             .instance
             .collection(collection)
-            .doc()
+            .doc(sentComment.id)
             .update({'postImage': downloadURL}));
       } else {
         postImage = '';

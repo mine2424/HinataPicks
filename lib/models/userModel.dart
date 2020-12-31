@@ -51,7 +51,7 @@ class UserModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchSelectedCustomerInfo(userUid) async {
+  Future<void> fetchSelectedCustomerInfo(String userUid) async {
     this.isLoading = true;
     var customerInfo;
     //customerInfoからuser画像を取得
