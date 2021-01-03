@@ -2,6 +2,8 @@ import '../importer.dart';
 import 'package:hinataPicks/gameBoard/board_user_info.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
+import 'board_room.dart';
+
 // ignore: must_be_immutable
 class BoardPage extends StatefulWidget {
   @override
@@ -83,7 +85,6 @@ class BoardPageState extends State<BoardPage> {
                         chatLength = snapshot.data.docs.length;
                         DateTime createdTime =
                             chatsItem.data()['createAt'].toDate();
-                        // print(chatsItem.data()['name']);
                         return (chatsItem.data()['name'] == '運営')
                             ? commentBox(chatsItem, createdTime, 'admin', index)
                             : commentBox(chatsItem, createdTime, '', index);
@@ -94,7 +95,8 @@ class BoardPageState extends State<BoardPage> {
     );
   }
 
-  Widget commentBox(chatsItem, createdTime, isAdmin, int heroCount) {
+  Widget commentBox(
+      QueryDocumentSnapshot chatsItem, createdTime, isAdmin, int heroCount) {
     final likeDoc = FirebaseFirestore.instance
         .collection('friendChats')
         .doc(chatsItem.id.toString());
@@ -105,6 +107,7 @@ class BoardPageState extends State<BoardPage> {
     return Row(
       children: [
         FlatButton(
+          minWidth: 30,
           onPressed: () {
             Navigator.push(
               context,
@@ -153,7 +156,7 @@ class BoardPageState extends State<BoardPage> {
                 ),
                 child:
                     Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -315,12 +318,22 @@ class BoardPageState extends State<BoardPage> {
                   ),
                   color: Colors.grey,
                   onPressed: () {
-                    var myName = chatsItem.data()['name'];
-                    showDialog<void>(
-                      context: context,
-                      builder: (_) => ReplyDialogWidget(
-                        myName: myName,
-                        chatsItem: chatsItem,
+                    var yourName = chatsItem.data()['name'];
+                    // showDialog<void>(
+                    //   context: context,
+                    //   builder: (_) => ReplyDialogWidget(
+                    //     myName: myName,
+                    //     chatsItem: chatsItem,
+                    //   ),
+                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => BoardRoomPage(
+                          yourName: yourName,
+                          messageUid: chatsItem.id,
+                          thisMessage: chatsItem,
+                        ),
                       ),
                     );
                   },

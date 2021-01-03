@@ -1,3 +1,5 @@
+import 'package:hinataPicks/gameBoard/board_room.dart';
+
 import '../importer.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
@@ -6,8 +8,13 @@ class BottomAddCommentButton extends StatefulWidget {
   var chatLength;
   String collection;
   String sendUser;
+  String messageUid;
   BottomAddCommentButton(
-      {Key key, @required this.collection, this.chatLength, this.sendUser})
+      {Key key,
+      @required this.collection,
+      this.chatLength,
+      this.sendUser,
+      this.messageUid})
       : super(key: key);
   @override
   _BottomAddCommentButtonState createState() => _BottomAddCommentButtonState();
@@ -36,7 +43,8 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
                           context: context,
                           builder: (_) => AlertDialogSection(
                               customerModel: customerModel,
-                              collection: widget.collection));
+                              collection: widget.collection,
+                              messageUid: widget.messageUid));
                     },
                     child: Icon(Icons.add),
                     backgroundColor: Color(0xff7cc8e9),
@@ -51,8 +59,10 @@ class _BottomAddCommentButtonState extends State<BottomAddCommentButton> {
 // ignore: must_be_immutable
 class AlertDialogSection extends StatefulWidget {
   var customerModel, collection;
+  String messageUid;
 
-  AlertDialogSection({Key key, this.customerModel, this.collection})
+  AlertDialogSection(
+      {Key key, this.customerModel, this.collection, this.messageUid})
       : super(key: key);
   @override
   _AlertDialogSectionState createState() => _AlertDialogSectionState();
@@ -111,22 +121,39 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
     }
   }
 
-  Future<void> addComment(collection, customerModel) async {
+  Future<void> addComment(
+      collection, customerModel, bool isPersonalRoom) async {
     if (_formKey.currentState.validate()) {
       print('start func');
       String userName, userImage = '';
       final _firebaseAuth = FirebaseAuth.instance.currentUser.uid;
       _formKey.currentState.save();
       // 各boardのcollectionを取得
-      final sendComment = FirebaseFirestore.instance.collection(collection);
-      print(sendComment.id);
+      CollectionReference sendRoomComment, sendComment;
+      if (isPersonalRoom) {
+        // await FirebaseFirestore.instance
+        //     .collection('friendChats')
+        //     .doc(widget.messageUid)
+        //     .collection('roomChats')
+        //     .doc('test')
+        //     .set({'test': 'test'});
+        sendRoomComment = FirebaseFirestore.instance
+            .collection('friendChats')
+            .doc(widget.messageUid)
+            .collection('roomChats');
+        print(sendRoomComment.toString());
+      } else {
+        sendComment = FirebaseFirestore.instance.collection(collection);
+      }
+
+      // print(sendComment.id);
       // 各Userのdocを取得
       final sendUserInfoDoc = await FirebaseFirestore.instance
           .collection('customerInfo')
           .doc(_firebaseAuth)
           .get();
       //投稿するユーザーの画像の判別
-      print(sendUserInfoDoc.data()['imagePath']);
+      // print(sendUserInfoDoc.data()['imagePath']);
       if (sendUserInfoDoc.data()['imagePath'] == null) {
         await FirebaseFirestore.instance
             .collection('customerInfo')
@@ -143,18 +170,29 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
         userName = customerModel.name;
       }
       print('previous post image');
-
-      var sentComment = await sendComment.add({
-        'userUid': _firebaseAuth,
-        'name': userName,
-        'context': content,
-        'like': 0,
-        'imagePath': userImage,
-        'createAt': Timestamp.now(),
-        'postImage': postImage,
-        'returnName': null,
-        'returnUserUid': ''
-      });
+      DocumentReference sentComment, sentRoomComment;
+      if (isPersonalRoom) {
+        sentRoomComment = await sendRoomComment.add({
+          'userUid': _firebaseAuth,
+          'name': userName,
+          'context': content,
+          'imagePath': userImage,
+          'createAt': Timestamp.now(),
+          'postImage': postImage,
+        });
+      } else {
+        sentComment = await sendComment.add({
+          'userUid': _firebaseAuth,
+          'name': userName,
+          'context': content,
+          'like': 0,
+          'imagePath': userImage,
+          'createAt': Timestamp.now(),
+          'postImage': postImage,
+          'returnName': null,
+          'returnUserUid': ''
+        });
+      }
 
       print('done add doc');
 
@@ -166,11 +204,21 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
             .ref('chatImages/' + _firebaseAuth + '.jpg')
             .putFile(_image);
         print(task.storage);
-        await task.ref.getDownloadURL().then((downloadURL) => FirebaseFirestore
-            .instance
-            .collection(collection)
-            .doc(sentComment.id)
-            .update({'postImage': downloadURL}));
+        if (isPersonalRoom) {
+          await task.ref.getDownloadURL().then((downloadURL) =>
+              FirebaseFirestore.instance
+                  .collection(collection)
+                  .doc(widget.messageUid)
+                  .collection('roomChats')
+                  .doc(sentRoomComment.id)
+                  .update({'postImage': downloadURL}));
+        } else {
+          await task.ref.getDownloadURL().then((downloadURL) =>
+              FirebaseFirestore.instance
+                  .collection(collection)
+                  .doc(sentComment.id)
+                  .update({'postImage': downloadURL}));
+        }
       } else {
         postImage = '';
       }
@@ -178,6 +226,9 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
 
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => HomeSection()));
+      //TODO not push but replacement
+      // Navigator.push(
+      //     context, MaterialPageRoute(builder: (context) => BoardRoomPage()));
     }
   }
 
@@ -272,7 +323,13 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
               if (_formKey.currentState.validate()) {
                 // TextFormFieldのonSavedが呼び出される
                 _formKey.currentState.save();
-                await addComment(widget.collection, widget.customerModel);
+                if (widget.messageUid == null) {
+                  await addComment(
+                      widget.collection, widget.customerModel, false);
+                } else {
+                  await addComment(
+                      widget.collection, widget.customerModel, true);
+                }
                 print('pass onPressed');
               }
             },
