@@ -105,32 +105,37 @@ class BoardPageState extends State<BoardPage> {
         .collection('customerInfo')
         .doc(_firebaseAuth);
     return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        FlatButton(
-          minWidth: 30,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    BoardUserInfoPage(userUid: chatsItem.data()['userUid']),
-              ),
-            );
-          },
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.16,
-            height: MediaQuery.of(context).size.width * 0.16,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-              image: DecorationImage(
-                fit: BoxFit.cover,
-                image: (chatsItem.data()['imagePath'] == null ||
-                        chatsItem.data()['imagePath'] == '')
-                    ? AssetImage('assets/images/hinakoi-chat.png')
-                    : NetworkImage(
-                        chatsItem.data()['imagePath'],
-                      ),
+        Padding(
+          padding: const EdgeInsets.only(top: 28),
+          child: FlatButton(
+            minWidth: 30,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      BoardUserInfoPage(userUid: chatsItem.data()['userUid']),
+                ),
+              );
+            },
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.16,
+              height: MediaQuery.of(context).size.width * 0.16,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: (chatsItem.data()['imagePath'] == null ||
+                          chatsItem.data()['imagePath'] == '')
+                      ? AssetImage('assets/images/hinakoi-chat.png')
+                      : NetworkImage(
+                          chatsItem.data()['imagePath'],
+                        ),
+                ),
               ),
             ),
           ),
@@ -233,8 +238,9 @@ class BoardPageState extends State<BoardPage> {
                                                     .size
                                                     .width *
                                                 0.55,
-                                            loadingBuilder: (context, child,
-                                                loadingProgress) {
+                                            height: 180, loadingBuilder:
+                                                (context, child,
+                                                    loadingProgress) {
                                           if (loadingProgress == null)
                                             return child;
                                           return Center(
@@ -342,39 +348,42 @@ class BoardPageState extends State<BoardPage> {
             )
           ],
         ),
-        PopupMenuButton<String>(
-          icon: Icon(
-            Icons.sms_failed_outlined,
-            size: 23,
+        Padding(
+          padding: const EdgeInsets.only(top: 24),
+          child: PopupMenuButton<String>(
+            icon: Icon(
+              Icons.sms_failed_outlined,
+              size: 23,
+            ),
+            itemBuilder: (BuildContext context) {
+              return _messageCautionsList.map((String s) {
+                return PopupMenuItem(
+                  child: FlatButton(
+                      onPressed: () {
+                        if (s == 'ブロック') {
+                          blockDialog(chatsItem);
+                        }
+                        if (s == '報告') {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SettingPage()));
+                        }
+                        if (s == '削除' &&
+                            _firebaseAuth == chatsItem.data()['userUid']) {
+                          _rmCommentMyself(chatsItem.id);
+                        }
+                      },
+                      child: (_firebaseAuth == chatsItem.data()['userUid'])
+                          ? Text(s)
+                          : (s == '削除')
+                              ? null
+                              : Text(s)),
+                  value: s,
+                );
+              }).toList();
+            },
           ),
-          itemBuilder: (BuildContext context) {
-            return _messageCautionsList.map((String s) {
-              return PopupMenuItem(
-                child: FlatButton(
-                    onPressed: () {
-                      if (s == 'ブロック') {
-                        blockDialog(chatsItem);
-                      }
-                      if (s == '報告') {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SettingPage()));
-                      }
-                      if (s == '削除' &&
-                          _firebaseAuth == chatsItem.data()['userUid']) {
-                        _rmCommentMyself(chatsItem.id);
-                      }
-                    },
-                    child: (_firebaseAuth == chatsItem.data()['userUid'])
-                        ? Text(s)
-                        : (s == '削除')
-                            ? null
-                            : Text(s)),
-                value: s,
-              );
-            }).toList();
-          },
         ),
       ],
     );

@@ -50,7 +50,7 @@ class BoardRoomPageState extends State<BoardRoomPage> {
     DateTime thisMessageDate = widget.thisMessage.data()['createAt'].toDate();
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.yourName, style: TextStyle(color: Colors.black)),
+        title: Text('返信', style: TextStyle(color: Colors.black)),
         iconTheme: const IconThemeData(color: Colors.black),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -68,7 +68,7 @@ class BoardRoomPageState extends State<BoardRoomPage> {
             .doc(widget.messageUid)
             .collection('roomChats')
             .orderBy('createAt', descending: true)
-            .limit(160)
+            .limit(100)
             .snapshots(),
         builder: (context, snapshot) {
           return (!snapshot.hasData)
@@ -82,42 +82,26 @@ class BoardRoomPageState extends State<BoardRoomPage> {
                     ],
                   ),
                 )
-              : (snapshot.data.docs.length == 0)
-                  ? (widget.thisMessage.data()['name'] == '運営')
-                      ? commentBox(widget.thisMessage, thisMessageDate, 'admin',
-                          0, false, true)
-                      : commentBox(widget.thisMessage, thisMessageDate, '', 0,
-                          false, true)
-                  : Column(
-                      children: [
-                        (widget.thisMessage.data()['name'] == '運営')
-                            ? commentBox(widget.thisMessage, thisMessageDate,
-                                'admin', 0, false, true)
-                            : commentBox(widget.thisMessage, thisMessageDate,
-                                '', 0, false, true),
-                        ListView.builder(
-                          itemCount: snapshot.data.docs.length,
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemBuilder: (BuildContext context, int index) {
-                            final chatsItem = snapshot.data.docs[index];
-                            chatLength = snapshot.data.docs.length;
-                            DateTime createdTime =
-                                chatsItem.data()['createAt'].toDate();
+              : ListView.builder(
+                  itemCount: snapshot.data.docs.length,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemBuilder: (BuildContext context, int index) {
+                    final chatsItem = snapshot.data.docs[index];
+                    chatLength = snapshot.data.docs.length;
+                    DateTime createdTime =
+                        chatsItem.data()['createAt'].toDate();
 
-                            return (chatsItem.data()['userUid'] ==
-                                    _firebaseAuth)
-                                ? commentBox(chatsItem, createdTime, '', index,
-                                    true, false)
-                                : (chatsItem.data()['name'] == '運営')
-                                    ? commentBox(chatsItem, createdTime,
-                                        'admin', index, false, false)
-                                    : commentBox(chatsItem, createdTime, '',
-                                        index, false, false);
-                          },
-                        ),
-                      ],
-                    );
+                    return (chatsItem.data()['userUid'] == _firebaseAuth)
+                        ? commentBox(
+                            chatsItem, createdTime, '', index, true, false)
+                        : (chatsItem.data()['name'] == '運営')
+                            ? commentBox(chatsItem, createdTime, 'admin', index,
+                                false, false)
+                            : commentBox(chatsItem, createdTime, '', index,
+                                false, false);
+                  },
+                );
         },
       ),
     );
@@ -548,8 +532,7 @@ class _ReplyDialogWidgetState extends State<ReplyDialogWidget> {
       }
       print('end func');
 
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => HomeSection()));
+      Navigator.pop(context);
     }
   }
 

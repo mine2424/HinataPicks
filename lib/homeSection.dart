@@ -42,16 +42,17 @@ class _HomeSectionState extends State<HomeSection> {
   }
 
   Future<void> anonymouslyLogin() async {
-    await FirebaseAuth.instance.signInAnonymously();
+    if (FirebaseAuth.instance.currentUser == null) {
+      await FirebaseAuth.instance.signInAnonymously();
+    }
     setState(() {
       isLoading = false;
     });
-    // final firebaseAuth = FirebaseAuth.instance;
   }
 
   Future<void> initializeFirestore() async {
     final _userUid = FirebaseAuth.instance.currentUser.uid;
-    await FirebaseFirestore.instance
+    FirebaseFirestore.instance
         .collection('customerInfo')
         .doc(_userUid)
         .get()

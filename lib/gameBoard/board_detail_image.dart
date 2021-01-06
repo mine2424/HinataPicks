@@ -6,32 +6,35 @@ class BoardDetailsImage extends StatelessWidget {
   BoardDetailsImage({Key key, this.image}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned(
-          child: AppBar(
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: FloatingActionButton(
             backgroundColor: Colors.transparent,
-            elevation: 0.0,
-            leading: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FloatingActionButton(
-                backgroundColor: Colors.transparent,
-                mini: true,
-                onPressed: () => Navigator.pop(context),
-                child: Icon(Icons.arrow_back, color: Colors.white),
-              ),
-            ),
+            mini: true,
+            onPressed: () => Navigator.pop(context),
+            child: Icon(Icons.arrow_back, color: Colors.white),
           ),
         ),
-        Hero(
-          tag: image.toString(),
-          child: Center(
-            child: SizedBox(
-              child: Image.network(image),
-            ),
-          ),
-        )
-      ],
+      ),
+      body: Center(
+        child: Stack(
+          children: [
+            Hero(
+              tag: image.toString(),
+              child: Center(
+                child: SizedBox(
+                  child: Image.network(image),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

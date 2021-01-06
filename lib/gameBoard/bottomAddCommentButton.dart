@@ -179,6 +179,7 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
           'imagePath': userImage,
           'createAt': Timestamp.now(),
           'postImage': postImage,
+          'token': sendUserInfoDoc.data()['token']
         });
       } else {
         sentComment = await sendComment.add({
@@ -190,7 +191,8 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
           'createAt': Timestamp.now(),
           'postImage': postImage,
           'returnName': null,
-          'returnUserUid': ''
+          'returnUserUid': '',
+          'token': sendUserInfoDoc.data()['token']
         });
       }
 
@@ -223,9 +225,12 @@ class _AlertDialogSectionState extends State<AlertDialogSection> {
         postImage = '';
       }
       print('end func');
-
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => HomeSection()));
+      if (isPersonalRoom) {
+        Navigator.pop(context);
+      } else {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => HomeSection()));
+      }
       //TODO not push but replacement
       // Navigator.push(
       //     context, MaterialPageRoute(builder: (context) => BoardRoomPage()));

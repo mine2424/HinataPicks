@@ -28,6 +28,12 @@ Future<void> initNotification() async {
         print('onResume: $message');
       },
     );
+  final token = await firebaseMessaging.getToken();
+  print(token);
+  await FirebaseFirestore.instance
+      .collection('customerInfo')
+      .doc(FirebaseAuth.instance.currentUser.uid)
+      .update({'token': token});
 }
 
 Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
