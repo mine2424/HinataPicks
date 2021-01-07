@@ -325,23 +325,23 @@ class BoardPageState extends State<BoardPage> {
                   color: Colors.grey,
                   onPressed: () {
                     var yourName = chatsItem.data()['name'];
-                    // showDialog<void>(
-                    //   context: context,
-                    //   builder: (_) => ReplyDialogWidget(
-                    //     myName: myName,
-                    //     chatsItem: chatsItem,
-                    //   ),
-                    // );
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => BoardRoomPage(
-                          yourName: yourName,
-                          messageUid: chatsItem.id,
-                          thisMessage: chatsItem,
-                        ),
+                    showDialog<void>(
+                      context: context,
+                      builder: (_) => ReplyDialogWidget(
+                        myName: yourName,
+                        chatsItem: chatsItem,
                       ),
                     );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (BuildContext context) => BoardRoomPage(
+                    //       yourName: yourName,
+                    //       messageUid: chatsItem.id,
+                    //       thisMessage: chatsItem,
+                    //     ),
+                    //   ),
+                    // );
                   },
                 ),
               ],
@@ -566,7 +566,7 @@ class _ReplyDialogWidgetState extends State<ReplyDialogWidget> {
         'createAt': Timestamp.now(),
         'returnName': replyInfo['name'],
         'returnUserUid': replyInfo['userUid'],
-        'postImage': '',
+        'postImage': null,
       });
 
       //TODO docの部分をどうするか考える（手前に持ってきてグローバル変数としてstrを持たせるのが得策とかんがえる）
