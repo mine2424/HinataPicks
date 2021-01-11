@@ -512,6 +512,7 @@ class _ReplyDialogWidgetState extends State<ReplyDialogWidget> {
         'returnName': replyInfo['name'],
         'returnUserUid': replyInfo['userUid'],
         'postImage': '',
+        'token': sendUserInfoDoc.data()['token']
       });
 
       //TODO docの部分をどうするか考える（手前に持ってきてグローバル変数としてstrを持たせるのが得策とかんがえる）

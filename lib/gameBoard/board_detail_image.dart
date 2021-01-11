@@ -1,3 +1,5 @@
+import 'package:photo_view/photo_view.dart';
+
 import '../importer.dart';
 
 // ignore: must_be_immutable
@@ -8,33 +10,59 @@ class BoardDetailsImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: FloatingActionButton(
-            backgroundColor: Colors.transparent,
-            mini: true,
-            onPressed: () => Navigator.pop(context),
-            child: Icon(Icons.arrow_back, color: Colors.white),
-          ),
-        ),
-      ),
-      body: Center(
+      body: Container(
         child: Stack(
+          // crossAxisAlignment: CrossAxisAlignment.start,
+          // mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Hero(
-              tag: image.toString(),
-              child: Center(
-                child: SizedBox(
-                  child: Image.network(image),
+            Positioned(
+              top: 20,
+              child: FlatButton(
+                hoverColor: Colors.white,
+                onPressed: () => Navigator.pop(context),
+                child: Icon(Icons.arrow_back, color: Colors.white),
+              ),
+            ),
+            Center(
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.85,
+                child: PhotoView(
+                  enableRotation: true,
+                  maxScale: PhotoViewComputedScale.covered * 3.5,
+                  imageProvider: NetworkImage(image),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
+      // body: SingleChildScrollView(
+      //   child: Stack(
+      //     children: [
+      //       Positioned(
+      //         left: 20,
+      //         top: 20,
+      //         child: Container(
+      //           padding: const EdgeInsets.all(8.0),
+      //           child: FlatButton(
+      //             onPressed: () => Navigator.pop(context),
+      //             child: Icon(Icons.arrow_back, color: Colors.white),
+      //           ),
+      //         ),
+      //       ),
+      //       Hero(
+      //         tag: image.toString(),
+      //         child: Center(
+      //           child: Column(
+      //             mainAxisAlignment: MainAxisAlignment.center,
+      //             crossAxisAlignment: CrossAxisAlignment.center,
+      //             children: [Image.network(image)],
+      //           ),
+      //         ),
+      //       )
+      //     ],
+      //   ),
+      // ),
     );
   }
 }

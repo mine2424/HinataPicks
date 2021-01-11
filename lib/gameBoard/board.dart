@@ -567,7 +567,9 @@ class _ReplyDialogWidgetState extends State<ReplyDialogWidget> {
         'returnName': replyInfo['name'],
         'returnUserUid': replyInfo['userUid'],
         'postImage': null,
+        'token': sendUserInfoDoc.data()['token']
       });
+      print(sendUserInfoDoc.data()['token']);
 
       //TODO docの部分をどうするか考える（手前に持ってきてグローバル変数としてstrを持たせるのが得策とかんがえる）
       if (_image2 != null) {
