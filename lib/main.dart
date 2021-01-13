@@ -21,6 +21,7 @@ class _MyAppState extends State<MyApp> {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         scaffoldBackgroundColor: Colors.white,
       ),
+      // home: HomeSection(),
       home: HomeSection(),
     );
   }

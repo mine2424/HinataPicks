@@ -276,27 +276,15 @@ class BoardPageState extends State<BoardPage> {
                     onPressed: () async {
                       final fetchLike = await likeDoc.get();
                       final fetchUserlike = await userDoc.get();
-                      if (isLike) {
-                        likeDoc.update({
-                          'like': fetchLike.data()['like'] + 1,
-                          'isLike': false
-                        });
-                        userDoc
-                            .update({'like': fetchUserlike.data()['like'] + 1});
-                        setState(() {
-                          isLike = false;
-                        });
-                      } else {
-                        likeDoc.update({
-                          'like': fetchLike.data()['like'] - 1,
-                          'isLike': true
-                        });
-                        userDoc
-                            .update({'like': fetchUserlike.data()['like'] - 1});
-                        setState(() {
-                          isLike = true;
-                        });
-                      }
+                      likeDoc.update({
+                        'like': fetchLike.data()['like'] + 1,
+                        'isLike': false
+                      });
+                      userDoc
+                          .update({'like': fetchUserlike.data()['like'] + 1});
+                      setState(() {
+                        isLike = false;
+                      });
                     }),
                 Text(
                   chatsItem.data()['like'].toString(),

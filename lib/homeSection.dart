@@ -1,4 +1,5 @@
 import 'package:hinataPicks/notification.dart';
+import 'package:hinataPicks/pole/pole.dart';
 
 import 'importer.dart';
 
@@ -33,6 +34,7 @@ class _HomeSectionState extends State<HomeSection> {
     anonymouslyLogin();
     initializeFirestore();
     initNotification();
+    _isPole();
     reviewDialog();
   }
 
@@ -123,6 +125,21 @@ class _HomeSectionState extends State<HomeSection> {
     }
   }
 
+  Future<void> _isPole() async {
+    final uid = FirebaseAuth.instance.currentUser.uid;
+    final isPoleDoc = await FirebaseFirestore.instance
+        .collection('customerInfo')
+        .doc(uid)
+        .get();
+    if (isPoleDoc.data()['twitter'] == null ||
+        isPoleDoc.data()['twitter'] == '') {
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (BuildContext context) => PolePage()));
+    } else {
+      return;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return (isLoading)
@@ -194,7 +211,7 @@ class _HomeSectionState extends State<HomeSection> {
                   ),
                   const ListTile(
                     title: const Text(
-                      'version 1.1.3',
+                      'version 1.1.8',
                       style: TextStyle(fontSize: 20),
                     ),
                   ),
